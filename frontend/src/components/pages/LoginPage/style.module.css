@@ -1,0 +1,37 @@
+.LoginWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+.LoginBox {
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    justify-content: center;
+    align-items: center;
+}
+
+.AuthSpan {
+    font-size: 30px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.RegisterLink {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.SubmitButton {
+    margin-top: 10px;
+    background-color: transparent !important;
+    color: black !important;
+    width: 100%;
+}
+.LoginForm {
+    width: 80%;
+}
