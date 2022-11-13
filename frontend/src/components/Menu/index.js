@@ -20,8 +20,8 @@ function getItem(label, key, icon, children, type) {
 }
 
 const items = [
-    getItem("Создать новый набор", "1", <PlusOutlined />),
-    getItem("Список всех наборов", "2", <UnorderedListOutlined />),
+    getItem("Создать", "1", <PlusOutlined />),
+    getItem("Наборы", "2", <UnorderedListOutlined />),
     getItem("Option 3", "3", <ContainerOutlined />),
 ];
 
@@ -33,11 +33,11 @@ export const MainMenu = () => {
     };
 
     return (
-        <Row>
-            <Col>
+        <Row style={{width: "100%"}}>
+            <Col span={3}>
                 <div
                     style={{
-                        width: 256,
+                        width: 210,
                     }}
                     className="App-menu_wrapper"
                 >
@@ -66,7 +66,7 @@ export const MainMenu = () => {
                     />
                 </div>
             </Col>
-            <Col>
+            <Col span={20} style={{width: "100%"}}>
                 <Outlet />
             </Col>
         </Row>

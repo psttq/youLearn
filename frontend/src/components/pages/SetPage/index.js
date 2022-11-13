@@ -2,41 +2,13 @@ import { Card } from "antd";
 import React from "react";
 
 export const SetPage = () => {
-    return (
-        <div className="App-main">
-            <Card title="Card title" bordered={false} className="Main-card">
-                Card content
-            </Card>
-            <Card title="Card title" bordered={false} className="Main-card">
-                Card content
-            </Card>
-            <Card title="Card title" bordered={false} className="Main-card">
-                Card content
-            </Card>
-            <Card title="Card title" bordered={false} className="Main-card">
-                Card content
-            </Card>
-            <Card title="Card title" bordered={false} className="Main-card">
-                Card content
-            </Card>
-            <Card title="Card title" bordered={false} className="Main-card">
-                Card content
-            </Card>
-            <Card title="Card title" bordered={false} className="Main-card">
-                Card content
-            </Card>
-            <Card title="Card title" bordered={false} className="Main-card">
-                Card content
-            </Card>
-            <Card title="Card title" bordered={false} className="Main-card">
-                Card content
-            </Card>
-            <Card title="Card title" bordered={false} className="Main-card">
-                Card content
-            </Card>
-            <Card title="Card title" bordered={false} className="Main-card">
-                Card content
-            </Card>
-        </div>
-    );
+  return (
+    <div className="App-main">
+      {
+      [...Array(15).keys()].map(()=> <Card title="Набор" bordered={false} className="Main-card">
+      Words
+      </Card>)
+    }
+    </div>
+  );
 };

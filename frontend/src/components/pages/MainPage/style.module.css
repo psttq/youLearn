@@ -1,15 +1,24 @@
 @import url("https://fonts.googleapis.com/css2?family=Comfortaa&family=Dancing+Script&display=swap");
-
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap');
 .Logo {
     font-size: 120px;
-    font-family: "Dancing Script", cursive;
-    background: -webkit-linear-gradient(rgb(251, 251, 251), rgb(255, 136, 0));
-    -webkit-background-clip: text;
+    font-family: "Nanum Gothic";
+    background: #ffad64;
+    font-weight: 400;
+        
+-webkit-background-clip: text;
+    /*-webkit-linear-gradient(rgb(251, 251, 251), rgb(255, 136, 0));    -webkit-background-clip: text;*/
     -webkit-text-fill-color: transparent;
     animation: bounce 2s infinite;
     -webkit-animation: bounce 2s infinite;
     -moz-animation: bounce 2s infinite;
     -o-animation: bounce 2s infinite;
+}
+
+
+.LogoBegin{
+    background:white;
+    -webkit-background-clip: text;
 }
 
 @-webkit-keyframes bounce {
@@ -88,12 +97,15 @@
     font-size: 18px;
     text-align: center;
     width: 400px;
-    font-family: "Comfortaa", cursive;
+    font-weight: 300;
+    font-family: "Hanum Gothic", cursive;
 }
 
 .BeginButton {
     margin-top: 20px;
     background: transparent !important;
-    border-color: #ffbe6e !important;
+    border-color: #aaffaa !important;
+    border-width: 2px !important;
     color: white !important;
+    border-radius: 5px !important;
 }
