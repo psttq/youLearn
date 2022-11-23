@@ -7,6 +7,7 @@ import { SetPage } from "./components/pages/SetPage";
 import { MainMenu } from "./components/Menu";
 import { LoginPage } from "./components/pages/LoginPage";
 import { RegisterPage } from "./components/pages/RegisterPage";
+import { ProfilePage } from "./components/pages/ProfilePage";
 
 function App() {
     return (
@@ -15,8 +16,9 @@ function App() {
                 <Route path="/" element={<MainPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-                <Route path="/set" element={<MainMenu />}>
-                    <Route path="all" element={<SetPage />} />
+                <Route path="/" element={<MainMenu />}>
+                    <Route path="sets" element={<SetPage />} />
+                    <Route path="profile" element={<ProfilePage />} />
                 </Route>
             </Routes>
         </div>

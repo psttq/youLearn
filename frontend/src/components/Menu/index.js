@@ -6,7 +6,11 @@ import {
   ContainerOutlined,
   UnorderedListOutlined,
   PlusOutlined,
-  UserOutlined
+  UserOutlined,
+  EditOutlined,
+  RocketOutlined,
+  StarOutlined,
+  LogoutOutlined
 } from "@ant-design/icons";
 import { Outlet, useNavigate } from "react-router-dom";
 
@@ -21,26 +25,37 @@ function getItem(label, key, icon, children, type) {
 }
 
 const items = [
-  getItem("Профиль", "profile", <UserOutlined />),
+  getItem("Профиль", "mainprofile", <UserOutlined />,
+    [
+      getItem("Страница", "profile", <StarOutlined />),
+      getItem("Редактировать", "editprofile", <EditOutlined />),
+      getItem("Выйти", "logout", <LogoutOutlined />)
+    ]
+  ),
   getItem("-", "-", undefined, undefined, "divider"),
-  getItem("Создать", "create", <PlusOutlined />),
-  getItem("Наборы", "sets", <UnorderedListOutlined />),
+  getItem("Наборы", "mainsets", <UnorderedListOutlined />, [
+    getItem("Мои", "sets", <RocketOutlined />),
+    getItem("Создать", "create", <PlusOutlined />),
+
+  ]),
   getItem("Option 3", "4", <ContainerOutlined />),
 ];
 
 export const MainMenu = () => {
   const [collapsed, setCollapsed] = useState(false);
-  
+
   const navigate = useNavigate();
-  
+
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
 
   const onMenuItemClicked = (item) => {
     let key = item.key;
-    if(key === "profile")
-      navigate("profile");
+    if (key === "profile")
+      navigate("/profile");
+    if (key === "sets")
+      navigate("/sets");
   };
 
   return (
@@ -75,7 +90,8 @@ export const MainMenu = () => {
             theme="lighth"
             inlineCollapsed={collapsed}
             items={items}
-          />
+            inlineIndent={16} 
+             />
         </div>
       </Col>
       <Col span={20} style={{ width: "100%" }}>

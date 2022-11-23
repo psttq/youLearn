@@ -35,3 +35,8 @@
 .LoginForm {
     width: 80%;
 }
+
+.errorAlert{
+    width: 80%;
+    margin-bottom: 20px !important;
+}

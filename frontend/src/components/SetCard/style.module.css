@@ -1,0 +1,21 @@
+.CardWrapper{
+ }
+
+.CardInfo{
+  position: relative;
+  top: 30px;
+  left: 10px;
+  width: 70px;
+  padding: 2px;
+  background-color: white;
+  border-radius: 5px;
+  z-index: 555;
+  display: flex;
+  justify-content: center;
+ }
+
+.progressContainer{
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
