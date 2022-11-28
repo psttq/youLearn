@@ -1,12 +1,23 @@
 import { Button, Form, Input } from "antd";
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useLayoutEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./style.module.css";
 import axios from "axios";
 
 var md5 = require('md5');
 
 export const LoginPage = () => {
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    let token = sessionStorage.getItem("token");
+    if (token != null) {
+      navigate("/profile");
+    }
+  })
+
+
   const onFinish = (values) => {
     axios.post('http://127.0.0.1:8000/login', {
       login: values.username,
@@ -14,7 +25,9 @@ export const LoginPage = () => {
     })
       .then(function(response) {
         if (response.status === 200) {
-          console.log("Success")
+          sessionStorage.setItem("token", response.data.token);
+          navigate("/profile");
+          console.log("Success", response.data.token);
         }
       })
       .catch(function(error) {

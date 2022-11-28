@@ -1,5 +1,5 @@
 import { Button, Col, Menu, Row } from "antd";
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -45,7 +45,8 @@ export const MainMenu = () => {
   const [collapsed, setCollapsed] = useState(false);
 
   const navigate = useNavigate();
-
+  
+  
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
@@ -60,7 +61,7 @@ export const MainMenu = () => {
 
   return (
     <Row style={{ width: "100%" }}>
-      <Col span={3}>
+      <Col span={4}>
         <div
           style={{
             width: 210,
@@ -94,7 +95,7 @@ export const MainMenu = () => {
              />
         </div>
       </Col>
-      <Col span={20} style={{ width: "100%" }}>
+      <Col span={19} style={{ width: "100%" }}>
         <Outlet />
       </Col>
     </Row>
