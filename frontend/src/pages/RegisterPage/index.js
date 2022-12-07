@@ -5,6 +5,7 @@ import styles from "./style.module.css";
 import axios from "axios";
 
 import { CheckOutlined } from "@ant-design/icons";
+import { API_URL } from '../../config';
 
 var md5 = require('md5');
 
@@ -16,7 +17,7 @@ export const RegisterPage = () => {
   const onFinish = async (values) => {
     console.log("Success:", values);
 
-    axios.post('http://127.0.0.1:8000/registration', {
+    axios.post(`${API_URL}/registration`, {
       login: values.username,
       password: md5(values.password)
     })
@@ -25,7 +26,7 @@ export const RegisterPage = () => {
           setRegistered(true);
       })
       .catch(function(error) {
-        if (error.response.status === 400) {
+        if (error.response.status === 409) {
           setLoginTaken(true);
         }
       });

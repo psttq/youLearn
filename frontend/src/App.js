@@ -2,12 +2,12 @@ import "./App.css";
 
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import { MainPage } from "./components/pages/MainPage";
-import { SetPage } from "./components/pages/SetPage";
+import { MainPage } from "./pages/MainPage";
+import { CardsDashboardPage } from "./pages/CardsDashboardPage";
 import { MainMenu } from "./components/Menu";
-import { LoginPage } from "./components/pages/LoginPage";
-import { RegisterPage } from "./components/pages/RegisterPage";
-import { ProfilePage } from "./components/pages/ProfilePage";
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { ProfilePage } from "./pages/ProfilePage";
 
 function App() {
     return (
@@ -17,7 +17,7 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/" element={<MainMenu />}>
-                    <Route path="sets" element={<SetPage />} />
+                    <Route path="sets" element={<CardsDashboardPage />} />
                     <Route path="profile" element={<ProfilePage />} />
                 </Route>
             </Routes>
