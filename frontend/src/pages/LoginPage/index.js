@@ -4,20 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./style.module.css";
 import axios from "axios";
 import { API_URL } from '../../config';
+import { setAuthCookies } from '../../auth/tools';
 
 var md5 = require('md5');
 
 export const LoginPage = () => {
-
     const navigate = useNavigate();
-
-    useEffect(() => {
-        let token = sessionStorage.getItem("token");
-        if (token != null) {
-            navigate("/profile");
-        }
-    })
-
 
     const onFinish = (values) => {
         axios.post(`${ API_URL }/login`, {
@@ -25,14 +17,24 @@ export const LoginPage = () => {
             password: md5(values.password),
         })
             .then(function (response) {
-                if (response.status === 200) {
-                    navigate("/profile");
+                const { token, expires } = response.data;
+
+                if (!token || !expires) {
+                    // TODO: Error
+
+                    return;
                 }
+
+                if(!setAuthCookies(token, expires)){
+                    // TODO: Expiration date parsed incorrectly
+                }
+
+                navigate('/profile');
+
+
             })
             .catch(function (error) {
-                if (error.response.status === 404) {
-                    console.log("Error");
-                }
+                console.log(error);
             });
     };
 
