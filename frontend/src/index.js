@@ -7,6 +7,7 @@ import { BrowserRouter } from "react-router-dom";
 import axios from 'axios';
 
 axios.defaults.withCredentials = true;
+axios.defaults.headers["Access-Control-Allow-Origin"] = "localhost:3000";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

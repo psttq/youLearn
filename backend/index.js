@@ -17,15 +17,17 @@ const SELECT_USER_BY_LOGIN_QUERY              = 'SELECT * FROM users WHERE login
 const INSERT_USER_QUERY                       = 'INSERT INTO users(login, password) VALUES($1, $2)'
 const SELECT_USER_BY_TOKEN_QUERY              = 'SELECT login FROM tokens JOIN users ON users.id = user_id WHERE token = $1'
 
+const corsOptions = {origin: "http://localhost:3000", credentials: true};
+
 app.use(bodyParser.json())
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(cookieParser())
 
 const client = new Client({
     user:     'postgres',
     host:     'localhost',
     database: 'youlearn',
-    password: '1',
+    password: 'qwerty78',
     port:     5432,
 })
 app.use(tokenMiddleware(client));
