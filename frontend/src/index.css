@@ -11,3 +11,6 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.ant-divider-vertical{
+  border-left: 1px solid rgba(49, 37, 37, 0.52) !important;
+}

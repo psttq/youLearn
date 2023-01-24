@@ -1,4 +1,4 @@
-import { Button, Col, Menu, Row } from "antd";
+import { Button, Col, Layout, Menu, Row } from "antd";
 import React, { useLayoutEffect, useState } from "react";
 import {
   MenuFoldOutlined,
@@ -13,6 +13,8 @@ import {
   LogoutOutlined
 } from "@ant-design/icons";
 import { Outlet, useNavigate } from "react-router-dom";
+
+const { Header, Sider, Content } = Layout;
 
 function getItem(label, key, icon, children, type) {
   return {
@@ -53,20 +55,15 @@ export const MainMenu = () => {
 
   const onMenuItemClicked = (item) => {
     let key = item.key;
-    if (key === "profile")
-      navigate("/profile");
-    if (key === "sets")
-      navigate("/sets");
+    navigate(`/${key}`)
   };
 
   return (
-    <Row style={{ width: "100%" }}>
-      <Col span={4}>
+    <Layout  className="mainLayout">
+      <Sider className="siderMenu" 
+      width={230}
+      collapsed={collapsed}>
         <div
-          style={{
-            width: 210,
-          }}
-          className="App-menu_wrapper"
         >
           <Button
             type="primary"
@@ -89,15 +86,14 @@ export const MainMenu = () => {
             onClick={(item) => onMenuItemClicked(item)}
             mode="inline"
             theme="lighth"
-            inlineCollapsed={collapsed}
             items={items}
             inlineIndent={16} 
              />
         </div>
-      </Col>
-      <Col span={19} style={{ width: "100%" }}>
-        <Outlet />
-      </Col>
-    </Row>
+      </Sider>
+      <Layout className="outletLayout">
+        <Content className="contentLayout" ><Outlet /></Content>
+      </Layout>
+    </Layout>
   );
 };

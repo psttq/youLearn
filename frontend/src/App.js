@@ -8,6 +8,7 @@ import { MainMenu } from "./components/Menu";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import CreateCardPage from "./pages/CreateCardPage";
 
 function App() {
     return (
@@ -19,6 +20,7 @@ function App() {
                 <Route path="/" element={<MainMenu />}>
                     <Route path="sets" element={<CardsDashboardPage />} />
                     <Route path="profile" element={<ProfilePage />} />
+                    <Route path="create" element={<CreateCardPage />} />
                 </Route>
             </Routes>
         </div>

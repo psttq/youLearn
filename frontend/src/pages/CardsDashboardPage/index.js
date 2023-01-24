@@ -7,10 +7,13 @@ import axios from 'axios';
 import { API_URL } from '../../config';
 
 export const CardsDashboardPage = () => {
-    const [cards, setCards] = useState([]);
+    const [cards, setCards] = useState([])
 
     useEffect(() => {
-        axios.get(`${ API_URL }/cards`).then(res => res.data)
+        axios.get(`${ API_URL }/cards`).then(res => res.data).then(data => {
+            console.log(data)
+            setCards(data)
+        })
     }, [])
 
     return (
@@ -27,7 +30,7 @@ export const CardsDashboardPage = () => {
             </div>
             <div className={ styles.SetsContainer }>
                 {
-                    [...Array(20).keys()].map(() => <CardPreview/>)
+                    cards.length > 0 && cards.map(card => <CardPreview id={card.id} title={card.title} imgUrl={card.img_url} key={card.id}/>)
                 }
             </div>
         </div>

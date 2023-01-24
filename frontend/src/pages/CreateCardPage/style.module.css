@@ -1,0 +1,14 @@
+.createCardContainer{
+    width: 100%;
+    height: 100%;
+}
+
+.previewText{
+    font-size: 25px;
+}
+
+.cardContainer{
+    display: flex;
+    justify-content: center;
+    margin-top: 10vh;
+}

@@ -16,6 +16,9 @@ const INSERT_TOKEN_QUERY                      = 'INSERT INTO tokens(user_id, tok
 const SELECT_USER_BY_LOGIN_QUERY              = 'SELECT * FROM users WHERE login=$1';
 const INSERT_USER_QUERY                       = 'INSERT INTO users(login, password) VALUES($1, $2)'
 const SELECT_USER_BY_TOKEN_QUERY              = 'SELECT login FROM tokens JOIN users ON users.id = user_id WHERE token = $1'
+const INSERT_CARD_QUERY                       = 'INSERT INTO cards(title, description, img_url) VALUES($1, $2, $3)'
+const SELECT_ALL_CARDS_QUERY                  = 'SELECT * FROM cards'
+
 
 const corsOptions = {origin: "http://localhost:3000", credentials: true};
 
@@ -24,9 +27,9 @@ app.use(cors(corsOptions));
 app.use(cookieParser())
 
 const client = new Client({
-    user:     'postgres',
-    host:     'localhost',
-    database: 'youlearn',
+    user:     'xyamix_db',
+    host:     '94.250.252.158',
+    database: 'postgres',
     password: 'qwerty78',
     port:     5432,
 })
@@ -69,6 +72,14 @@ app.get('/user-info', async (req, res) => {
     res.json({ login, avatarUrl });
 });
 
+app.get('/cards', async (req, res) => {
+    const token = getTokenFromCookie(req);
+
+    const cards = await client.query(SELECT_ALL_CARDS_QUERY);
+
+    res.json(cards.rows);
+});
+
 
 app.post('/registration', async (req, res) => {
     const { login, password } = req.body;
@@ -84,6 +95,14 @@ app.post('/registration', async (req, res) => {
     return res.send('SUCCESS');
 });
 
+app.post('/createcard', async (req, res) => {
+    const { title, description, imgUrl } = req.body;
+
+
+    await client.query(INSERT_CARD_QUERY, [title, description, imgUrl])
+
+    return res.send('SUCCESS');
+});
 app.get('/', (req, res) => {
 
 })
