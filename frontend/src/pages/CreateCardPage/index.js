@@ -71,8 +71,9 @@ function CreateCardPage(props) {
                             style={{marginTop: 30}}
                             onFieldsChange={onFormChanged}
                             name="basic"
+                            layout={window.innerWidth < 1500 ? 'vertical' : 'horizontal'}
                             labelCol={{span: 8}}
-                            wrapperCol={{span: 16}}
+                            wrapperCol={{span: 12}}
                             validateTrigger="onChange"
                             autoComplete="off"
                             onFinish={handleSubmit}
