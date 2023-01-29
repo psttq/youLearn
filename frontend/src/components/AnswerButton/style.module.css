@@ -1,0 +1,11 @@
+.AnswerButton {
+    padding: 15px;
+    border-radius: 6px;
+    filter: opacity(80%);
+    border: 2px dashed;
+}
+
+.AnswerButton:hover {
+    filter: brightness(120%);
+    cursor: pointer;
+}

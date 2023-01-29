@@ -47,6 +47,10 @@
     background-color: #ad494930 !important;
 }
 
+.ant-menu-submenu{
+    background: white !important;
+}
+
 .ant-menu-vertical .ant-menu-item::after,
 .ant-menu-vertical-left .ant-menu-item::after,
 .ant-menu-vertical-right .ant-menu-item::after,

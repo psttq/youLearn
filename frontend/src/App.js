@@ -10,6 +10,7 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import CreateCardPage from "./pages/CreateCardPage";
 import MainCardPage from "./pages/MainCardPage";
+import TestMainPage from "./pages/TestMainPage";
 
 function App() {
     return (
@@ -23,6 +24,8 @@ function App() {
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="create" element={<CreateCardPage />} />
                     <Route path="card/edit/:id" element={<MainCardPage />} />
+                    <Route path="test/:id" element={<TestMainPage />} />
+
                 </Route>
             </Routes>
         </div>

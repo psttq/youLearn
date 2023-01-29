@@ -6,6 +6,7 @@ import {tags_for_antd_select} from "../../temp/temp";
 import axios from "axios";
 import {API_URL} from "../../config";
 import md5 from "md5";
+import {stringToColour} from "../../Utils/utils";
 
 function CreateCardPage(props) {
     const handleSubmit = async (values) => {
@@ -47,7 +48,7 @@ function CreateCardPage(props) {
         };
         return (
             <Tag
-                color={"red"}
+                color={stringToColour(label)}
                 onMouseDown={onPreventMouseDown}
                 closable={closable}
                 onClose={onClose}
