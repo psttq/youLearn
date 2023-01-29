@@ -31,3 +31,9 @@
   max-height: 150px;
   overflow-y: scroll;
 }
+
+.Category:hover {
+  filter: brightness(150%);
+  cursor: pointer;
+
+}

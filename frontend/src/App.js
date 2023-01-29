@@ -9,6 +9,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import CreateCardPage from "./pages/CreateCardPage";
+import MainCardPage from "./pages/MainCardPage";
 
 function App() {
     return (
@@ -21,6 +22,7 @@ function App() {
                     <Route path="sets" element={<CardsDashboardPage />} />
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="create" element={<CreateCardPage />} />
+                    <Route path="card/edit/:id" element={<MainCardPage />} />
                 </Route>
             </Routes>
         </div>

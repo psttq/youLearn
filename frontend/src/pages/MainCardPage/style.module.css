@@ -1,0 +1,32 @@
+.CardDescription{
+    width: 60%;
+}
+
+.CardInfo{
+    display: flex;
+    justify-content: space-between;
+}
+
+.CardImage{
+    border-radius: 10px;
+}
+
+.CardContainer{
+    padding-left: 50px;
+    width: 90%;
+}
+
+.CardCategories{
+    padding-top: 30px;
+}
+
+.CardCategoriesContainer{
+    margin-top: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.CardTable{
+    margin-top: 25px;
+}

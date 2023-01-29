@@ -1,21 +1,35 @@
-.CardWrapper{
- }
+.CardWrapper {
+}
 
-.CardInfo{
-  position: relative;
-  top: 30px;
-  left: 10px;
-  width: 70px;
-  padding: 2px;
-  background-color: white;
-  border-radius: 5px;
-  z-index: 555;
-  display: flex;
-  justify-content: center;
- }
+.CardInfo {
+    position: relative;
+    top: 30px;
+    left: 10px;
+    min-width: 70px;
+    z-index: 555;
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 20px 2px 2px;
+}
 
-.progressContainer{
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
+.TestNumber {
+    background-color: white;
+    border-radius: 5px;
+    width: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+}
+
+.progressContainer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.Category{
+    max-width: 140px;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
