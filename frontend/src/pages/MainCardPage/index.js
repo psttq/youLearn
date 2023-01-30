@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import styles from './style.module.css';
 import {useParams} from "react-router-dom";
 
@@ -6,6 +6,8 @@ import {stringToColour} from '../../Utils/utils';
 
 import {Divider, Image, Tag, Typography} from "antd";
 import {Space, Table} from "antd/lib";
+import axios from "axios";
+import {API_URL} from "../../config";
 
 const {Title, Text} = Typography;
 
@@ -54,27 +56,36 @@ const exampleCategories = ["Математика", "Комплексные чи�
 
 const MainCardPage = () => {
     let {id} = useParams();
+
+    const [card, setCard] = useState({tags: []});
+
+    useEffect(() => {
+        axios.post(`${API_URL}/card`, {
+            card_id: id
+        }).then(res => res.data).then(data => {
+            console.log(data);
+            setCard(data)
+        })
+    }, [])
+
     return (
         <div className="App-main">
             <div className={styles.CardContainer}>
-                <Title>Комплексные числа </Title>
+                <Title>{card.title}</Title>
                 <div className={styles.CardInfo}>
                     <Text className={styles.CardDescription}>
-                        На данном уроке мы познакомимся с понятием комплексного числа, рассмотрим алгебраическую,
-                        тригонометрическую и показательную форму комплексного числа. А также научимся выполнять действия
-                        с комплексными числами: сложение, вычитание, умножение, деление, возведение в степень и
-                        извлечение корня.
+                        {card.description}
                     </Text>
                     <Image
                         className={styles.CardImage}
                         width={250}
-                        src="https://cs5.pikabu.ru/post_img/big/2015/12/25/12/1451076553148776733.png"
+                        src={card.img_url}
                     />
                 </div>
                 <div className={styles.CardCategories}>
                     <Title level={4}>Категории:</Title>
                     <div className={styles.CardCategoriesContainer}>
-                        {exampleCategories.map((category) => <Tag color={stringToColour(category)}>{category}</Tag>)}
+                        {card.tags.map((category) => <Tag color={stringToColour(category)}>{category}</Tag>)}
                     </div>
                 </div>
                 <Divider />

@@ -13,7 +13,7 @@ const TestMainPage = (props) => {
                     <Button danger ghost>Назад</Button>
                     <Button danger ghost>Пропустить</Button>
                 </div>
-                <Progress style={{marginTop: 20}} percent={45} status="active" strokeColor={{from: '#108ee9', to: '#87d068'}}/>
+                <Progress style={{marginTop: 40}} percent={45} status="active" strokeColor={{from: '#108ee9', to: '#87d068'}}/>
                 <div className={styles.TestBox}>
                     <Test type="1"/>
                 </div>

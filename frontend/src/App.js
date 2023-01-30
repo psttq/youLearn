@@ -11,6 +11,7 @@ import { ProfilePage } from "./pages/ProfilePage";
 import CreateCardPage from "./pages/CreateCardPage";
 import MainCardPage from "./pages/MainCardPage";
 import TestMainPage from "./pages/TestMainPage";
+import TestEditPage from "./pages/TestEditPage";
 
 function App() {
     return (
@@ -25,7 +26,7 @@ function App() {
                     <Route path="create" element={<CreateCardPage />} />
                     <Route path="card/edit/:id" element={<MainCardPage />} />
                     <Route path="test/:id" element={<TestMainPage />} />
-
+                    <Route path="test/edit/:id" element={<TestEditPage />} />
                 </Route>
             </Routes>
         </div>

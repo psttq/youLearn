@@ -8,9 +8,9 @@ import {Tooltip} from "antd/lib";
 const {Meta} = Card;
 const exampleCategories = ["Математика", "Комплексные числа", "Введение в комплексный анализ", "ТФКП"]
 
-const CardPreview = ({id, title, testCount, progress, imgUrl}) => {
+const CardPreview = ({id, title, testCount, progress, imgUrl, category}) => {
     const navigate = useNavigate();
-    let category = exampleCategories[Math.floor(Math.random()*100)%4]
+    category = category === undefined ? "Категория" : category;
     return (
         <div className={styles.CardWrapper}>
             <div className={styles.CardInfo}>

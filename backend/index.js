@@ -14,10 +14,18 @@ const SELECT_TOKEN_QUERY                      = 'SELECT * FROM tokens WHERE user
 const UPDATE_TOKEN_QUERY                      = 'UPDATE tokens SET token=$2, expiration_date=$3 WHERE user_id=$1';
 const INSERT_TOKEN_QUERY                      = 'INSERT INTO tokens(user_id, token, expiration_date) VALUES($1, $2, $3)';
 const SELECT_USER_BY_LOGIN_QUERY              = 'SELECT * FROM users WHERE login=$1';
-const INSERT_USER_QUERY                       = 'INSERT INTO users(login, password) VALUES($1, $2)'
-const SELECT_USER_BY_TOKEN_QUERY              = 'SELECT login FROM tokens JOIN users ON users.id = user_id WHERE token = $1'
-const INSERT_CARD_QUERY                       = 'INSERT INTO cards(title, description, img_url) VALUES($1, $2, $3)'
-const SELECT_ALL_CARDS_QUERY                  = 'SELECT * FROM cards'
+const INSERT_USER_QUERY                       = 'INSERT INTO users(login, password) VALUES($1, $2)';
+const SELECT_USER_BY_TOKEN_QUERY              = 'SELECT login FROM tokens JOIN users ON users.id = user_id WHERE token = $1';
+const INSERT_CARD_QUERY                       = 'INSERT INTO cards(title, description, img_url, creator_id) VALUES($1, $2, $3, $4)';
+const SELECT_ALL_CARDS_QUERY                  = 'SELECT * FROM cards';
+const SELECT_ALL_TAGS_QUERY                   = 'SELECT name FROM tags';
+const SELECT_CARD_BY_TITLE_QUERY              = 'SELECT id FROM cards WHERE title=$1';
+const SELECT_CARD_BY_ID                       = 'SELECT * FROM cards WHERE id = $1';
+const SELECT_TAG_BY_NAME_QUERY                = 'SELECT id FROM tags WHERE name=$1';
+const INSERT_TAG_QUERY                        = 'INSERT INTO tags(name) VALUES($1)';
+const INSERT_TAG_TO_CARD_QUERY                = 'INSERT INTO card_tags(card_id, tag_id) VALUES($1, $2)';
+const SELECT_USER_ID_BY_TOKEN                 = 'SELECT user_id FROM tokens WHERE token=$1';
+const SELECT_TAGS_BY_CARD_ID                  = 'SELECT name FROM card_tags JOIN tags on card_tags.tag_id = tags.id WHERE card_id = $1; '
 
 
 const corsOptions = {origin: "http://localhost:3000", credentials: true};
@@ -75,11 +83,36 @@ app.get('/user-info', async (req, res) => {
 app.get('/cards', async (req, res) => {
     const token = getTokenFromCookie(req);
 
-    const cards = await client.query(SELECT_ALL_CARDS_QUERY);
+    let cards = await client.query(SELECT_ALL_CARDS_QUERY);
+    cards = cards.rows;
 
-    res.json(cards.rows);
+    for(let card of cards) {
+        let tags = await client.query(SELECT_TAGS_BY_CARD_ID, [card.id]);
+        tags = tags.rows.map(tag => tag.name);
+        card.tags = tags;
+    }
+
+    res.json(cards);
 });
 
+
+app.post('/card', async (req, res) => {
+    const { card_id } = req.body;
+    let card_info = await client.query(SELECT_CARD_BY_ID, [card_id]);
+    console.log(card_info.rows.length)
+    if(card_info?.rows.length === 0)
+    {
+        res.status(404)
+        return res.send('CARD NOT FOUND');
+    }
+    let card = card_info.rows[0];
+
+    let tags = await client.query(SELECT_TAGS_BY_CARD_ID, [card_id]);
+    tags = tags.rows.map(tag => tag.name);
+    card.tags = tags;
+
+    res.json(card);
+});
 
 app.post('/registration', async (req, res) => {
     const { login, password } = req.body;
@@ -96,17 +129,46 @@ app.post('/registration', async (req, res) => {
 });
 
 app.post('/createcard', async (req, res) => {
-    const { title, description, imgUrl } = req.body;
+    const { title, description, imgUrl, tags } = req.body;
+    const token = getTokenFromCookie(req);
 
+    const user_info = await client.query(SELECT_USER_ID_BY_TOKEN, [token]);
+    const user_id =  user_info.rows[0].user_id;
 
-    await client.query(INSERT_CARD_QUERY, [title, description, imgUrl])
+    console.log(user_id);
 
+    await client.query(INSERT_CARD_QUERY, [title, description, imgUrl, user_id])
+
+    const card_info = await client.query(SELECT_CARD_BY_TITLE_QUERY, [title])
+
+    const card_id = card_info.rows[0].id;
+    for (const tag of tags) {
+        let tag_info = await client.query(SELECT_TAG_BY_NAME_QUERY, [tag]);
+        if (tag_info.rows?.length) {
+            const tag_id = tag_info.rows[0].id;
+            await client.query(INSERT_TAG_TO_CARD_QUERY, [card_id, tag_id]);
+        }
+        else{
+            await client.query(INSERT_TAG_QUERY, [tag]);
+            tag_info = await client.query(SELECT_TAG_BY_NAME_QUERY, [tag]);
+            const tag_id = tag_info.rows[0].id;
+            await client.query(INSERT_TAG_TO_CARD_QUERY, [card_id, tag_id]);
+        }
+    }
     return res.send('SUCCESS');
 });
+
+app.get('/getalltags', async (req, res) => {
+    const tagsResult      = await client.query(SELECT_ALL_TAGS_QUERY);
+    let tags = tagsResult.rows.map(res => res.name);
+    return res.send(tags);
+})
+
 app.get('/', (req, res) => {
 
 })
 
 app.listen(port, () => {
     console.log(`Example app listening on http://localhost:${ port }`)
+
 })

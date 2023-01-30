@@ -15,11 +15,15 @@ const exampleCategories = ["Математика", "Комплексные чи�
 
 export const CardsDashboardPage = () => {
     const [cards, setCards] = useState([])
+    const [tags, setTags] = useState([])
 
     useEffect(() => {
         axios.get(`${API_URL}/cards`).then(res => res.data).then(data => {
-            console.log(data)
             setCards(data)
+        })
+
+        axios.get(`${API_URL}/getalltags`).then(res => res.data).then(data => {
+            setTags(data)
         })
     }, [])
 
@@ -32,13 +36,13 @@ export const CardsDashboardPage = () => {
                 </div>
                 <span className={styles.categorySpan}>Категории:</span>
                 <div className={styles.categoryContainer}>
-                    {exampleCategories.map((category) => <Tag className={styles.Category} color={stringToColour(category)}>{category}</Tag>)}
+                    {tags.map((category) => <Tag className={styles.Category} color={stringToColour(category)}>{category}</Tag>)}
                 </div>
             </div>
             <div className={styles.SetsContainer}>
                 {
                     cards.length > 0 && cards.map(card => <CardPreview id={card.id} title={card.title}
-                                                                       imgUrl={card.img_url} key={card.id}/>)
+                                                                       imgUrl={card.img_url} key={card.id} category={card.tags[0]}/>)
                 }
             </div>
         </div>
