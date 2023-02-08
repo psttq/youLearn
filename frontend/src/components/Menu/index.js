@@ -36,7 +36,7 @@ const items = [
   ),
   getItem("-", "-", undefined, undefined, "divider"),
   getItem("Наборы", "mainsets", <UnorderedListOutlined />, [
-    getItem("Мои", "sets", <RocketOutlined />),
+    getItem("Все", "sets", <RocketOutlined />),
     getItem("Создать", "create", <PlusOutlined />),
 
   ]),

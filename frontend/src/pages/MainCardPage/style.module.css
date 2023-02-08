@@ -2,6 +2,19 @@
     width: 60%;
 }
 
+.CardText{
+    display: flex;
+    flex-direction: column;
+}
+
+.CardAuthor{
+    margin-top: 30px;
+}
+
+.CardAuthorText{
+    font-weight: bold;
+}
+
 .CardInfo{
     display: flex;
     justify-content: space-between;

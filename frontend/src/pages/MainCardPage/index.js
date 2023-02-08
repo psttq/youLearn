@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styles from './style.module.css';
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {useMutation, useQuery} from "react-query";
 
 import {stringToColour} from '../../Utils/utils';
@@ -29,8 +29,8 @@ const columns = [
         key: 'action',
         render: (_, record) => (
             <Space size="middle">
-                <a>Редактировать</a>
-                <a>Удалить</a>
+                <Link to={`/test/edit/${record.id}`}>Редактировать</Link>
+                <Link>Удалить</Link>
             </Space>
         ),
     },
@@ -97,14 +97,20 @@ const MainCardPage = () => {
             <div className={styles.CardContainer}>
                 <Title>{card.title}</Title>
                 <div className={styles.CardInfo}>
-                    <Text className={styles.CardDescription}>
-                        {card.description}
-                    </Text>
+                    <div className={styles.CardText}>
+                        <Text className={styles.CardDescription}>
+                            {card.description}
+                        </Text>
+                        <Text className={styles.CardAuthor}>
+                            <span className={styles.CardAuthorText}>Автор:</span> {card.creator_login}
+                        </Text>
+                    </div>
                     <Image
                         className={styles.CardImage}
                         width={250}
                         src={card.img_url}
                     />
+
                 </div>
                 <div className={styles.CardCategories}>
                     <Title level={4}>Категории:</Title>

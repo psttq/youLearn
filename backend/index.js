@@ -16,6 +16,7 @@ const INSERT_TOKEN_QUERY = 'INSERT INTO tokens(user_id, token, expiration_date) 
 const SELECT_USER_BY_LOGIN_QUERY = 'SELECT * FROM users WHERE login=$1';
 const INSERT_USER_QUERY = 'INSERT INTO users(login, password) VALUES($1, $2)';
 const SELECT_USER_BY_TOKEN_QUERY = 'SELECT login FROM tokens JOIN users ON users.id = user_id WHERE token = $1';
+const SELECT_USER_BY_ID = 'SELECT login FROM users WHERE id = $1';
 const INSERT_CARD_QUERY = 'INSERT INTO cards(title, description, img_url, creator_id) VALUES($1, $2, $3, $4)';
 const SELECT_ALL_CARDS_QUERY = 'SELECT * FROM cards';
 const SELECT_ALL_TAGS_QUERY = 'SELECT name FROM tags';
@@ -30,6 +31,10 @@ const SELECT_TESTS_BY_CARD_ID = 'SELECT * FROM tests WHERE card_id = $1';
 const CREATE_TEST_QUERY = "INSERT INTO tests(card_id, question) VALUES($1, 'Вопрос?')";
 const CREATE_TEST_ANSWER_QUERY = "INSERT INTO test_answers(text, is_correct, test_id) VALUES('Ответ', $1, $2)";
 const SELECT_LAST_TEST_ID_BY_CARD_ID = "SELECT id FROM tests WHERE card_id = $1 ORDER BY id DESC LIMIT 1";
+const UPDATE_TEST_QUESTION_BY_ID = "UPDATE tests SET question = $1, type = $2 WHERE id = $3";
+const SELECT_ALL_TEST_ANSWERS_BY_TEST_ID = "SELECT * FROM test_answers WHERE test_id = $1";
+const UPDATE_TEST_ANSWER_BY_ID = "UPDATE test_answers SET text = $1, is_correct = $2 WHERE id = $3";
+const SELECT_TEST_BY_ID = "SELECT * FROM tests WHERE id = $1";
 
 const corsOptions = {origin: "http://localhost:3000", credentials: true};
 
@@ -111,6 +116,9 @@ app.post('/card', async (req, res) => {
     let tags = await client.query(SELECT_TAGS_BY_CARD_ID, [card_id]);
     tags = tags.rows.map(tag => tag.name);
     card.tags = tags;
+    const user_info = await client.query(SELECT_USER_BY_ID, [card.creator_id]);
+
+    card.creator_login = user_info.rows?.[0]?.login;
 
     res.json(card);
 });
@@ -127,6 +135,29 @@ app.post('/registration', async (req, res) => {
     await client.query(INSERT_USER_QUERY, [login, password])
 
     return res.send('SUCCESS');
+});
+
+app.post("/updatetest", async (req, res) => {
+    console.log(req.body);
+    const {test_id, question, answer, type} = req.body;
+    await client.query(UPDATE_TEST_QUESTION_BY_ID, [question, type === "qubic" ? 0 : 1, test_id]);
+    //get all answers by test_id
+    const answers_info = await client.query(SELECT_ALL_TEST_ANSWERS_BY_TEST_ID, [test_id]);
+    const answers_from_db = answers_info.rows;
+    //update answers
+    for (let i = 0; i < answers_from_db.length; i++) {
+        await client.query(UPDATE_TEST_ANSWER_BY_ID, [answer[i], i === 0, answers_from_db[i].id])
+    }
+    res.send('SUCCESS');
+});
+
+app.post("/gettest", async (req, res) => {
+    const {test_id} = req.body;
+    const test_info = await client.query(SELECT_TEST_BY_ID, [test_id]);
+    const test = test_info.rows[0];
+    const answers_info = await client.query(SELECT_ALL_TEST_ANSWERS_BY_TEST_ID, [test_id]);
+    test.answers = answers_info.rows;
+    res.json(test);
 });
 
 app.post('/createcard', async (req, res) => {

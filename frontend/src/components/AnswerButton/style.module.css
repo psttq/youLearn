@@ -6,6 +6,6 @@
 }
 
 .AnswerButton:hover {
-    filter: brightness(120%);
+    filter: brightness(180%);
     cursor: pointer;
 }

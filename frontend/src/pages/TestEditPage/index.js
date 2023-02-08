@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import styles from "./style.module.css";
 import Test from "../../components/Test";
 import {Button, Form, Input, Progress, Radio, Select, Typography} from "antd";
@@ -6,13 +6,13 @@ import TestPreview from "../../components/TestPreview";
 import {tags_for_antd_select} from "../../temp/temp";
 import axios from "axios";
 import {API_URL} from "../../config";
-import { RiLayoutGridLine, RiLayoutRowLine} from "react-icons/ri";
+import {RiLayoutGridLine, RiLayoutRowLine} from "react-icons/ri";
+import {useParams} from "react-router-dom";
 
 const {Title, Text} = Typography;
 const TestEditPage = (props) => {
-    const handleSubmit = async (values) => {
+    let {id} = useParams();
 
-    }
     const [fieldValues, setFieldValues] = useState({
         question: "Новый тест",
         answers: [
@@ -22,9 +22,33 @@ const TestEditPage = (props) => {
             "Ответ 4"
         ]
         ,
-        type: "qibic"
+        type: "qubic"
 
     });
+
+    useEffect(() => {
+        //get test by id and id in body of request
+        axios.post(`${API_URL}/gettest`, {test_id: id}).then(res => {
+            console.log(res);
+            let newFieldValues = {...fieldValues};
+            newFieldValues.question = res.data.question
+            newFieldValues.answers = res.data.answers.map(answer => answer.text);
+            newFieldValues.type = res.data.type === 0 ? "qibic" : "vertical";
+            setFieldValues(newFieldValues);
+        }).catch(err => {
+            console.log(err);
+        });
+    }, []);
+
+    const handleSubmit = async (values) => {
+        values.test_id = id;
+        axios.post(`${API_URL}/updatetest`, values).then(res => {
+            console.log(res);
+        }).catch(err => {
+            console.log(err);
+        })
+    }
+
 
     let onFormChanged = (changedFields) => {
         let newFieldValues = {...fieldValues};
@@ -64,7 +88,7 @@ const TestEditPage = (props) => {
                         </Form.Item>
 
                         <Form.Item
-                            label="Ответ 1"
+                            label="Правильный ответ"
                             name={["answer", 0]}
                             required={true}
                         >
@@ -95,8 +119,8 @@ const TestEditPage = (props) => {
 
                         <Form.Item label="Отображение" name="type">
                             <Radio.Group>
-                                <Radio.Button value="qubic"><RiLayoutGridLine /></Radio.Button>
-                                <Radio.Button value="vertiacal"><RiLayoutRowLine /></Radio.Button>
+                                <Radio.Button value="qubic"><RiLayoutGridLine/></Radio.Button>
+                                <Radio.Button value="vertical"><RiLayoutRowLine/></Radio.Button>
                             </Radio.Group>
                         </Form.Item>
 
