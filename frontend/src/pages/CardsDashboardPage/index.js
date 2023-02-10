@@ -20,6 +20,7 @@ export const CardsDashboardPage = () => {
     useEffect(() => {
         axios.get(`${API_URL}/cards`).then(res => res.data).then(data => {
             setCards(data)
+            console.log(data)
         })
 
         axios.get(`${API_URL}/getalltags`).then(res => res.data).then(data => {
@@ -42,7 +43,7 @@ export const CardsDashboardPage = () => {
             <div className={styles.SetsContainer}>
                 {
                     cards.length > 0 && cards.map(card => <CardPreview id={card.id} title={card.title}
-                                                                       imgUrl={card.img_url} key={card.id} category={card.tags[0]}/>)
+                                                                       imgUrl={card.img_url} key={card.id} category={card.tags[0]} testCount={card.test_count}/>)
                 }
             </div>
         </div>

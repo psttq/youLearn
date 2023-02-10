@@ -13,9 +13,11 @@ import MainCardPage from "./pages/MainCardPage";
 import TestMainPage from "./pages/TestMainPage";
 import TestEditPage from "./pages/TestEditPage";
 import {
-   QueryClient,
-   QueryClientProvider,
- } from 'react-query'
+    QueryClient,
+    QueryClientProvider,
+} from 'react-query'
+import {Provider} from "react-redux";
+import {store} from "./redux/store";
 
 
 function App() {
@@ -29,21 +31,23 @@ function App() {
     })
     return (
         <QueryClientProvider client={queryClient}>
-            <div className="App">
-                <Routes>
-                    <Route path="/" element={<MainPage/>}/>
-                    <Route path="/login" element={<LoginPage/>}/>
-                    <Route path="/register" element={<RegisterPage/>}/>
-                    <Route path="/" element={<MainMenu/>}>
-                        <Route path="sets" element={<CardsDashboardPage/>}/>
-                        <Route path="profile" element={<ProfilePage/>}/>
-                        <Route path="create" element={<CreateCardPage/>}/>
-                        <Route path="card/edit/:id" element={<MainCardPage/>}/>
-                        <Route path="test/:id" element={<TestMainPage/>}/>
-                        <Route path="test/edit/:id" element={<TestEditPage/>}/>
-                    </Route>
-                </Routes>
-            </div>
+            <Provider store={store}>
+                <div className="App">
+                    <Routes>
+                        <Route path="/" element={<MainPage/>}/>
+                        <Route path="/login" element={<LoginPage/>}/>
+                        <Route path="/register" element={<RegisterPage/>}/>
+                        <Route path="/" element={<MainMenu/>}>
+                            <Route path="sets" element={<CardsDashboardPage/>}/>
+                            <Route path="profile" element={<ProfilePage/>}/>
+                            <Route path="create" element={<CreateCardPage/>}/>
+                            <Route path="card/edit/:id" element={<MainCardPage/>}/>
+                            <Route path="test/:id" element={<TestMainPage/>}/>
+                            <Route path="test/edit/:id" element={<TestEditPage/>}/>
+                        </Route>
+                    </Routes>
+                </div>
+            </Provider>
         </QueryClientProvider>
     );
 }

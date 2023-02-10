@@ -15,7 +15,7 @@ const UPDATE_TOKEN_QUERY = 'UPDATE tokens SET token=$2, expiration_date=$3 WHERE
 const INSERT_TOKEN_QUERY = 'INSERT INTO tokens(user_id, token, expiration_date) VALUES($1, $2, $3)';
 const SELECT_USER_BY_LOGIN_QUERY = 'SELECT * FROM users WHERE login=$1';
 const INSERT_USER_QUERY = 'INSERT INTO users(login, password) VALUES($1, $2)';
-const SELECT_USER_BY_TOKEN_QUERY = 'SELECT login FROM tokens JOIN users ON users.id = user_id WHERE token = $1';
+const SELECT_USER_BY_TOKEN_QUERY = 'SELECT * FROM tokens JOIN users ON users.id = user_id WHERE token = $1';
 const SELECT_USER_BY_ID = 'SELECT login FROM users WHERE id = $1';
 const INSERT_CARD_QUERY = 'INSERT INTO cards(title, description, img_url, creator_id) VALUES($1, $2, $3, $4)';
 const SELECT_ALL_CARDS_QUERY = 'SELECT * FROM cards';
@@ -82,9 +82,12 @@ app.post('/login', async (req, res) => {
 app.get('/user-info', async (req, res) => {
     const token = getTokenFromCookie(req);
 
-    const {login, 'avatar_url': avatarUrl} = (await client.query(SELECT_USER_BY_TOKEN_QUERY, [token]))?.rows[0];
-
-    res.json({login, avatarUrl});
+    const {id, login, 'avatar_url': avatarUrl} = (await client.query(SELECT_USER_BY_TOKEN_QUERY, [token]))?.rows[0];
+    const token_info = await client.query(SELECT_TOKEN_QUERY, [id]);
+    let data = {user_id: id, login, avatarUrl};
+    data.token = token_info.rows[0].token;
+    data.expires = token_info.rows[0].expiration_date;
+    res.json(data);
 });
 
 app.get('/cards', async (req, res) => {
@@ -95,6 +98,8 @@ app.get('/cards', async (req, res) => {
 
     for (let card of cards) {
         let tags = await client.query(SELECT_TAGS_BY_CARD_ID, [card.id]);
+        const tests = await client.query(SELECT_TESTS_BY_CARD_ID, [card.id]);
+        card.test_count = tests.rows?.length;
         tags = tags.rows.map(tag => tag.name);
         card.tags = tags;
     }
@@ -112,6 +117,9 @@ app.post('/card', async (req, res) => {
         return res.send('CARD NOT FOUND');
     }
     let card = card_info.rows[0];
+
+    let tests = await client.query(SELECT_TESTS_BY_CARD_ID, [card_id]);
+    card.test_count = tests.rows?.length;
 
     let tags = await client.query(SELECT_TAGS_BY_CARD_ID, [card_id]);
     tags = tags.rows.map(tag => tag.name);

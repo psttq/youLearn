@@ -20,6 +20,18 @@
     justify-content: space-between;
 }
 
+.CardHeader{
+    display: flex;
+    position: relative;
+    gap: 35px;
+    left: -70px;
+}
+
+.BackButton{
+    position: relative;
+    top: 8px;
+}
+
 .CardImage{
     border-radius: 10px;
 }

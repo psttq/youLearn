@@ -1,17 +1,21 @@
 import React, {useEffect, useState} from 'react';
 import styles from "./style.module.css";
-import Test from "../../components/Test";
 import {Button, Form, Input, Progress, Radio, Select, Typography} from "antd";
 import TestPreview from "../../components/TestPreview";
-import {tags_for_antd_select} from "../../temp/temp";
 import axios from "axios";
 import {API_URL} from "../../config";
 import {RiLayoutGridLine, RiLayoutRowLine} from "react-icons/ri";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
+import {ClockLoader} from "react-spinners";
+import {useMutation} from "react-query";
+
+import {LeftOutlined} from "@ant-design/icons";
+
 
 const {Title, Text} = Typography;
 const TestEditPage = (props) => {
     let {id} = useParams();
+    let navigate = useNavigate();
 
     const [fieldValues, setFieldValues] = useState({
         question: "Новый тест",
@@ -26,18 +30,22 @@ const TestEditPage = (props) => {
 
     });
 
-    useEffect(() => {
-        //get test by id and id in body of request
-        axios.post(`${API_URL}/gettest`, {test_id: id}).then(res => {
+    const getTestMutation = useMutation((test_id) => {
+        return axios.post(`${API_URL}/gettest`, {test_id: test_id}).then(res => {
             console.log(res);
             let newFieldValues = {...fieldValues};
             newFieldValues.question = res.data.question
             newFieldValues.answers = res.data.answers.map(answer => answer.text);
-            newFieldValues.type = res.data.type === 0 ? "qibic" : "vertical";
+            newFieldValues.type = res.data.type === 0 ? "qubic" : "vertical";
             setFieldValues(newFieldValues);
+            console.log(newFieldValues)
         }).catch(err => {
             console.log(err);
         });
+    });
+
+    useEffect(() => {
+        getTestMutation.mutate(id);
     }, []);
 
     const handleSubmit = async (values) => {
@@ -63,79 +71,89 @@ const TestEditPage = (props) => {
 
     return (
         <div className="App-main">
-            <div className={styles.TestContainer}>
-                <Title>Редактирование теста</Title>
-                <div>
-                    <Form
-                        style={{marginTop: 30}}
-                        onFieldsChange={onFormChanged}
-                        name="basic"
-                        layout={window.innerWidth < 800 ? 'vertical' : 'horizontal'}
-                        labelCol={{span: 8}}
-                        wrapperCol={{span: 12}}
-                        validateTrigger="onChange"
-                        autoComplete="off"
-                        onFinish={handleSubmit}
-                    >
-
-                        <Form.Item
-                            label="Вопрос"
-                            name="question"
-                            required={true}
-
+            {getTestMutation.isLoading ? <div className={styles.Loader}><ClockLoader/></div> :
+                <div className={styles.TestContainer}>
+                    <div className={styles.TestHeader}>
+                        <Button type="primary" shape="circle" className={styles.BackButton} onClick={() => navigate(-1)}
+                                icon={<LeftOutlined/>}/>
+                        <Title>Редактирование теста</Title>
+                    </div>
+                    <div>
+                        <Form
+                            style={{marginTop: 30}}
+                            onFieldsChange={onFormChanged}
+                            name="basic"
+                            layout={window.innerWidth < 800 ? 'vertical' : 'horizontal'}
+                            labelCol={{span: 8}}
+                            wrapperCol={{span: 12}}
+                            validateTrigger="onChange"
+                            autoComplete="off"
+                            onFinish={handleSubmit}
                         >
-                            <Input.TextArea/>
-                        </Form.Item>
 
-                        <Form.Item
-                            label="Правильный ответ"
-                            name={["answer", 0]}
-                            required={true}
-                        >
-                            <Input.TextArea/>
-                        </Form.Item>
+                            <Form.Item
+                                label="Вопрос"
+                                name="question"
+                                required={true}
+                                initialValue={fieldValues.question}
+                            >
+                                <Input.TextArea/>
+                            </Form.Item>
 
-                        <Form.Item
-                            label="Ответ 2"
-                            name={["answer", 1]}
-                            required={true}
-                        >
-                            <Input.TextArea/>
-                        </Form.Item>
-                        <Form.Item
-                            label="Ответ 3"
-                            name={["answer", 2]}
-                            required={true}
-                        >
-                            <Input.TextArea/>
-                        </Form.Item>
-                        <Form.Item
-                            label="Ответ 4"
-                            name={["answer", 3]}
-                            required={true}
-                        >
-                            <Input.TextArea/>
-                        </Form.Item>
+                            <Form.Item
+                                label="Правильный ответ"
+                                name={["answer", 0]}
+                                required={true}
+                                initialValue={fieldValues.answers[0]}
+                            >
+                                <Input.TextArea/>
+                            </Form.Item>
 
-                        <Form.Item label="Отображение" name="type">
-                            <Radio.Group>
-                                <Radio.Button value="qubic"><RiLayoutGridLine/></Radio.Button>
-                                <Radio.Button value="vertical"><RiLayoutRowLine/></Radio.Button>
-                            </Radio.Group>
-                        </Form.Item>
+                            <Form.Item
+                                label="Ответ 2"
+                                name={["answer", 1]}
+                                required={true}
+                                initialValue={fieldValues.answers[1]}
+                            >
+                                <Input.TextArea/>
+                            </Form.Item>
+                            <Form.Item
+                                label="Ответ 3"
+                                name={["answer", 2]}
+                                required={true}
+                                initialValue={fieldValues.answers[2]}
+                            >
+                                <Input.TextArea/>
+                            </Form.Item>
+                            <Form.Item
+                                label="Ответ 4"
+                                name={["answer", 3]}
+                                required={true}
+                                initialValue={fieldValues.answers[3]}
+                            >
+                                <Input.TextArea/>
+                            </Form.Item>
 
-                        <Form.Item wrapperCol={{offset: 8, span: 16}}>
-                            <Button type="primary" htmlType="submit">
-                                Сохранить
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                </div>
-                <div className={styles.TestBox}>
-                    <Title level={3}>Превью:</Title>
-                    <TestPreview type={fieldValues.type} question={fieldValues.question} answers={fieldValues.answers}/>
-                </div>
-            </div>
+                            <Form.Item label="Отображение" name="type" initialValue={fieldValues.type}>
+                                <Radio.Group>
+                                    <Radio.Button value="qubic"><RiLayoutGridLine/></Radio.Button>
+                                    <Radio.Button value="vertical"><RiLayoutRowLine/></Radio.Button>
+                                </Radio.Group>
+                            </Form.Item>
+
+                            <Form.Item wrapperCol={{offset: 8, span: 16}}>
+                                <Button type="primary" htmlType="submit">
+                                    Сохранить
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                    </div>
+                    <div className={styles.TestBox}>
+                        <Title level={3}>Превью:</Title>
+                        <TestPreview type={fieldValues.type} question={fieldValues.question}
+                                     answers={fieldValues.answers}/>
+                    </div>
+                </div>}
         </div>
     )
 };
