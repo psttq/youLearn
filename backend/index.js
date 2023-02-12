@@ -9,6 +9,9 @@ const {getTokenFromCookie} = require('./tools');
 const app = express()
 const port = 8000
 
+const https = require("https");
+const fs = require("fs");
+
 const SELECT_USER_BY_LOGIN_AND_PASSWORD_QUERY = 'SELECT id FROM users WHERE login = $1 AND password = $2';
 const SELECT_TOKEN_QUERY = 'SELECT * FROM tokens WHERE user_id=$1';
 const UPDATE_TOKEN_QUERY = 'UPDATE tokens SET token=$2, expiration_date=$3 WHERE user_id=$1';
@@ -267,7 +270,12 @@ app.get('/', (req, res) => {
 
 })
 
-app.listen(port, () => {
-    console.log(`Example app listening on http://localhost:${port}`)
+https
+    .createServer( {
+        key: fs.readFileSync("key.pem"),
+        cert: fs.readFileSync("cert.pem"),
+    },app)
+    .listen(port, ()=>{
+        console.log(`Example app listening on http://localhost:${port}`)
+    });
 
-})
