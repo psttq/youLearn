@@ -42,7 +42,7 @@ const SELECT_ALL_CARDS_BY_NAME = "SELECT * FROM cards WHERE title LIKE $1";
 const DELETE_CARD_BY_ID = "DELETE FROM cards WHERE id = $1";
 const DELETE_TEST_BY_ID = "DELETE FROM tests WHERE id = $1";
 
-const corsOptions = {origin: "http://localhost:3000", credentials: true};
+const corsOptions = {origin: "https://localhost:3000", credentials: true};
 
 app.use(bodyParser.json())
 app.use(cors(corsOptions));
