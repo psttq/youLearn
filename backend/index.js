@@ -19,7 +19,7 @@ const SELECT_USER_BY_TOKEN_QUERY = 'SELECT * FROM tokens JOIN users ON users.id 
 const SELECT_USER_BY_ID = 'SELECT login FROM users WHERE id = $1';
 const INSERT_CARD_QUERY = 'INSERT INTO cards(title, description, img_url, creator_id) VALUES($1, $2, $3, $4)';
 const SELECT_ALL_CARDS_QUERY = 'SELECT * FROM cards';
-const SELECT_ALL_TAGS_QUERY = 'SELECT name FROM tags';
+const SELECT_ALL_TAGS_QUERY = 'SELECT * FROM tags';
 const SELECT_CARD_BY_TITLE_QUERY = 'SELECT id FROM cards WHERE title=$1';
 const SELECT_CARD_BY_ID = 'SELECT * FROM cards WHERE id = $1';
 const SELECT_TAG_BY_NAME_QUERY = 'SELECT id FROM tags WHERE name=$1';
@@ -35,6 +35,9 @@ const UPDATE_TEST_QUESTION_BY_ID = "UPDATE tests SET question = $1, type = $2 WH
 const SELECT_ALL_TEST_ANSWERS_BY_TEST_ID = "SELECT * FROM test_answers WHERE test_id = $1";
 const UPDATE_TEST_ANSWER_BY_ID = "UPDATE test_answers SET text = $1, is_correct = $2 WHERE id = $3";
 const SELECT_TEST_BY_ID = "SELECT * FROM tests WHERE id = $1";
+const SELECT_ALL_CARDS_BY_NAME = "SELECT * FROM cards WHERE title LIKE $1";
+const DELETE_CARD_BY_ID = "DELETE FROM cards WHERE id = $1";
+const DELETE_TEST_BY_ID = "DELETE FROM tests WHERE id = $1";
 
 const corsOptions = {origin: "http://localhost:3000", credentials: true};
 
@@ -49,9 +52,19 @@ const client = new Client({
     password: 'qwerty78',
     port: 5433,
 })
+
+
 app.use(tokenMiddleware(client));
 
-client.connect().then(() => console.log('DB Connected')).catch('DB connection failed');
+function connect() {
+    client.on('error', error => {
+        connect();
+    });
+    return client.connect().then(() => console.log('DB Connected')).catch('DB connection failed');;
+}
+
+
+connect()
 
 app.post('/login', async (req, res) => {
     debugger;
@@ -90,10 +103,28 @@ app.get('/user-info', async (req, res) => {
     res.json(data);
 });
 
-app.get('/cards', async (req, res) => {
-    const token = getTokenFromCookie(req);
+app.post('/cards', async (req, res) => {
 
-    let cards = await client.query(SELECT_ALL_CARDS_QUERY);
+    const {name, categories} = req.body;
+
+    const token = getTokenFromCookie(req);
+    console.log(name, categories);
+
+    let cards;
+    if (categories?.length) {
+        let categoriesString = `(${categories.join(', ')})`
+        console.log(categoriesString)
+        const query = `SELECT * FROM cards JOIN card_tags ON cards.id = card_tags.card_id WHERE tag_id IN ${categoriesString} ${name ? `AND title LIKE '%${name}%'` : ""}`;
+        console.log(query)
+        cards = await client.query(query);
+    } else {
+        if (name !== null) {
+            cards = await client.query(SELECT_ALL_CARDS_BY_NAME, [`%${name}%`]);
+        } else {
+            cards = await client.query(SELECT_ALL_CARDS_QUERY);
+        }
+    }
+
     cards = cards.rows;
 
     for (let card of cards) {
@@ -131,6 +162,18 @@ app.post('/card', async (req, res) => {
     res.json(card);
 });
 
+app.post('/delete_card', async (req, res) => {
+    const {card_id} = req.body;
+    await client.query(DELETE_CARD_BY_ID, [card_id]);
+    res.send('SUCCESS');
+});
+
+app.post('/delete_test', async (req, res) => {
+    const {test_id} = req.body;
+    await client.query(DELETE_TEST_BY_ID, [test_id]);
+    res.send('SUCCESS');
+});
+
 app.post('/registration', async (req, res) => {
     const {login, password} = req.body;
     const userInfoResult = await client.query(SELECT_USER_BY_LOGIN_QUERY, [login]);
@@ -161,6 +204,7 @@ app.post("/updatetest", async (req, res) => {
 
 app.post("/gettest", async (req, res) => {
     const {test_id} = req.body;
+    console.log(test_id)
     const test_info = await client.query(SELECT_TEST_BY_ID, [test_id]);
     const test = test_info.rows[0];
     const answers_info = await client.query(SELECT_ALL_TEST_ANSWERS_BY_TEST_ID, [test_id]);
@@ -199,8 +243,7 @@ app.post('/createcard', async (req, res) => {
 
 app.get('/getalltags', async (req, res) => {
     const tagsResult = await client.query(SELECT_ALL_TAGS_QUERY);
-    let tags = tagsResult.rows.map(res => res.name);
-    return res.send(tags);
+    return res.send(tagsResult.rows);
 })
 
 app.post('/get_tests', async (req, res) => {

@@ -18,6 +18,7 @@ import {
 } from 'react-query'
 import {Provider} from "react-redux";
 import {store} from "./redux/store";
+import MySetsPage from "./pages/MySetsPage";
 
 
 function App() {
@@ -39,9 +40,10 @@ function App() {
                         <Route path="/register" element={<RegisterPage/>}/>
                         <Route path="/" element={<MainMenu/>}>
                             <Route path="sets" element={<CardsDashboardPage/>}/>
+                            <Route path="mysets" element={<MySetsPage/>}/>
                             <Route path="profile" element={<ProfilePage/>}/>
                             <Route path="create" element={<CreateCardPage/>}/>
-                            <Route path="card/edit/:id" element={<MainCardPage/>}/>
+                            <Route path="card/:id" element={<MainCardPage/>}/>
                             <Route path="test/:id" element={<TestMainPage/>}/>
                             <Route path="test/edit/:id" element={<TestEditPage/>}/>
                         </Route>

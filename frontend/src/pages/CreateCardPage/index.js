@@ -7,10 +7,15 @@ import axios from "axios";
 import {API_URL} from "../../config";
 import md5 from "md5";
 import {stringToColour} from "../../Utils/utils";
+import {useDispatch} from "react-redux";
+import {setNotification} from "../../redux/slices/notificationSlice";
+import {useNavigate} from "react-router";
 
 function CreateCardPage(props) {
 
     const [availableTags, setAvailableTags] = useState([]);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     useEffect(() => {
         axios.get(`${API_URL}/getalltags`).then(response => {
@@ -18,7 +23,7 @@ function CreateCardPage(props) {
             if (availableTags.length === 0) {
                 let tags = response.data.map(e => {
                     return {
-                        value: e
+                        value: e.name
                     }
                 });
                 setAvailableTags(tags);
@@ -29,6 +34,8 @@ function CreateCardPage(props) {
 
     const handleSubmit = async (values) => {
         console.log(values);
+        values.imgUrl = !values.imgUrl || values.imgUrl === "" ? "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/F1_light_blue_flag.svg/2560px-F1_light_blue_flag.svg.png" : values.imgUrl;
+        values.tags = !values.tags || values.tags.length === 0 ? ["Пустота"] : values.tags;
         axios.post(`${API_URL}/createcard`, {
             title: values.title,
             description: values.description,
@@ -36,11 +43,24 @@ function CreateCardPage(props) {
             tags: values.tags
         })
             .then(function (response) {
-                if (response.status === 200)
-                    console.log("SUCCCESSS")
+                if (response.status === 200) {
+                    dispatch(setNotification({
+                        notify: true,
+                        target: "dashboard",
+                        message: "Карточка была успешно создана!",
+                        status: "success"
+                    }));
+                    navigate('/sets');
+                }
             })
             .catch(function (error) {
-                console.log("FAIL")
+                dispatch(setNotification({
+                    notify: true,
+                    target: "dashboard",
+                    message: "Ошибка во время создании карточки!",
+                    status: "error"
+                }));
+                navigate('/sets');
             });
     }
     const [fieldValues, setFieldValues] = useState({
@@ -55,8 +75,8 @@ function CreateCardPage(props) {
         changedFields.forEach(field => {
             newFieldValues[field.name[0]] = field.value;
         })
-        newFieldValues.imgUrl = newFieldValues.imgUrl === "" ? undefined : newFieldValues.imgUrl;
-        newFieldValues.tags = newFieldValues.tags.length === 0 ? ["Категория"]: newFieldValues.tags;
+        newFieldValues.imgUrl = newFieldValues.imgUrl === "" || !newFieldValues.imgUrl ? "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/F1_light_blue_flag.svg/2560px-F1_light_blue_flag.svg.png" : newFieldValues.imgUrl;
+        newFieldValues.tags = newFieldValues.tags.length === 0 ? ["Пустота"] : newFieldValues.tags;
         setFieldValues(newFieldValues);
     }
     const tagRender = (props) => {

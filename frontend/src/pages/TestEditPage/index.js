@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import styles from "./style.module.css";
-import {Button, Form, Input, Progress, Radio, Select, Typography} from "antd";
+import {Button, Form, Input, notification, Progress, Radio, Select, Typography} from "antd";
 import TestPreview from "../../components/TestPreview";
 import axios from "axios";
 import {API_URL} from "../../config";
@@ -32,15 +32,12 @@ const TestEditPage = (props) => {
 
     const getTestMutation = useMutation((test_id) => {
         return axios.post(`${API_URL}/gettest`, {test_id: test_id}).then(res => {
-            console.log(res);
             let newFieldValues = {...fieldValues};
             newFieldValues.question = res.data.question
             newFieldValues.answers = res.data.answers.map(answer => answer.text);
             newFieldValues.type = res.data.type === 0 ? "qubic" : "vertical";
             setFieldValues(newFieldValues);
-            console.log(newFieldValues)
         }).catch(err => {
-            console.log(err);
         });
     });
 
@@ -51,9 +48,19 @@ const TestEditPage = (props) => {
     const handleSubmit = async (values) => {
         values.test_id = id;
         axios.post(`${API_URL}/updatetest`, values).then(res => {
-            console.log(res);
+            notification.success({
+                message: `Успех`,
+                description:
+                "Тест успешно обновлен",
+                placement: "bottomRight",
+            });
         }).catch(err => {
-            console.log(err);
+            notification.error({
+                message: `Ошибка`,
+                description:
+                "Произошла ошибка при обновлении теста",
+                placement: "bottomRight",
+            });
         })
     }
 

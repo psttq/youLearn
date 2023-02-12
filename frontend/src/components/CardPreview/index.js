@@ -30,7 +30,7 @@ const CardPreview = ({id, title, testCount, progress, imgUrl, category}) => {
                     height: 320,
                 }}
                 onClick={() => {
-                    navigate(`/card/edit/${id}`)
+                    navigate(`/card/${id}`)
                 }}
                 cover={<img
                     src={imgUrl ? imgUrl : "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/F1_light_blue_flag.svg/2560px-F1_light_blue_flag.svg.png"}

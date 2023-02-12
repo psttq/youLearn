@@ -1,10 +1,10 @@
 .CardDescription{
-    width: 60%;
 }
 
 .CardText{
     display: flex;
     flex-direction: column;
+    max-width: 60%;
 }
 
 .CardAuthor{
@@ -25,6 +25,17 @@
     position: relative;
     gap: 35px;
     left: -70px;
+}
+
+.optionsButtonContainer{
+    width: 100%;
+    position: absolute;
+    left: 40px;
+}
+
+.optionsMenu{
+    position: relative;
+    left: 108%;
 }
 
 .BackButton{
