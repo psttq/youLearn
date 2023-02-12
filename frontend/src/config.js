@@ -1,4 +1,4 @@
-const API_URL    = 'http://localhost:8000';
+const API_URL    = 'https://localhost:8000';
 const CLIENT_URL = 'http://localhost:3000';
 
 module.exports = {
