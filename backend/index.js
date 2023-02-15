@@ -1,5 +1,5 @@
 const express = require('express');
-const {Client} = require('pg')
+const {Pool} = require('pg')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const {v4: uuidv4} = require('uuid');
@@ -41,6 +41,8 @@ const SELECT_TEST_BY_ID = "SELECT * FROM tests WHERE id = $1";
 const SELECT_ALL_CARDS_BY_NAME = "SELECT * FROM cards WHERE title LIKE $1";
 const DELETE_CARD_BY_ID = "DELETE FROM cards WHERE id = $1";
 const DELETE_TEST_BY_ID = "DELETE FROM tests WHERE id = $1";
+const UPDATE_CARD_BY_ID = "UPDATE cards SET title=$2, description=$3, img_url=$4 WHERE id=$1";
+const DELETE_CARD_TAGS_BY_CARD_ID = "DELETE FROM card_tags WHERE card_id=$1";
 
 const corsOptions = {origin: "https://localhost:3000", credentials: true};
 
@@ -48,12 +50,15 @@ app.use(bodyParser.json())
 app.use(cors(corsOptions));
 app.use(cookieParser())
 
-const client = new Client({
+const client = new Pool({
     user: 'xyamix_db',
     host: '94.250.252.158',
     database: 'youLearn',
     password: 'qwerty78',
     port: 5433,
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
 })
 
 
@@ -63,13 +68,14 @@ function connect() {
     client.on('error', error => {
         connect();
     });
-    return client.connect().then(() => console.log('DB Connected')).catch('DB connection failed');;
+    return client.connect().then(() => console.log('DB Connected')).catch('DB connection failed');
+    ;
 }
 
 
 connect()
 
-app.post('/login', async (req, res) => {
+app.post('/login', cors(corsOptions), async (req, res) => {
     debugger;
     const {login, password} = req.body;
     const userInfoResult = await client.query(SELECT_USER_BY_LOGIN_AND_PASSWORD_QUERY, [login, password]);
@@ -95,7 +101,7 @@ app.post('/login', async (req, res) => {
     res.json({token, expires});
 });
 
-app.get('/user-info', async (req, res) => {
+app.get('/user-info', cors(corsOptions), async (req, res) => {
     const token = getTokenFromCookie(req);
 
     const {id, login, 'avatar_url': avatarUrl} = (await client.query(SELECT_USER_BY_TOKEN_QUERY, [token]))?.rows[0];
@@ -106,7 +112,7 @@ app.get('/user-info', async (req, res) => {
     res.json(data);
 });
 
-app.post('/cards', async (req, res) => {
+app.post('/cards', cors(corsOptions), async (req, res) => {
 
     const {name, categories} = req.body;
 
@@ -141,8 +147,44 @@ app.post('/cards', async (req, res) => {
     res.json(cards);
 });
 
+app.post('/mycards', cors(corsOptions), async (req, res) => {
 
-app.post('/card', async (req, res) => {
+    const {name, categories} = req.body;
+
+    const token = getTokenFromCookie(req);
+    const {id: user_id} = (await client.query(SELECT_USER_BY_TOKEN_QUERY, [token]))?.rows[0];
+    console.log(name, categories);
+
+    let cards;
+    if (categories?.length) {
+        let categoriesString = `(${categories.join(', ')})`
+        console.log(categoriesString)
+        const query = `SELECT * FROM cards JOIN card_tags ON cards.id = card_tags.card_id WHERE tag_id IN ${categoriesString} ${name ? `AND title LIKE '%${name}%' AND creator_id=${user_id}` : ""}`;
+        console.log(query)
+        cards = await client.query(query);
+    } else {
+        if (name !== null) {
+            cards = await client.query(SELECT_ALL_CARDS_BY_NAME + ` AND creator_id=${user_id}`, [`%${name}%`]);
+        } else {
+            cards = await client.query(SELECT_ALL_CARDS_QUERY + ` WHERE creator_id=${user_id}`);
+        }
+    }
+
+    cards = cards.rows;
+
+    for (let card of cards) {
+        let tags = await client.query(SELECT_TAGS_BY_CARD_ID, [card.id]);
+        const tests = await client.query(SELECT_TESTS_BY_CARD_ID, [card.id]);
+        card.test_count = tests.rows?.length;
+        tags = tags.rows.map(tag => tag.name);
+        card.tags = tags;
+    }
+
+    res.json(cards);
+});
+
+
+app.post('/card', cors(corsOptions), async (req, res) => {
     const {card_id} = req.body;
     let card_info = await client.query(SELECT_CARD_BY_ID, [card_id]);
     console.log(card_info.rows.length)
@@ -165,19 +207,19 @@ app.post('/card', async (req, res) => {
     res.json(card);
 });
 
-app.post('/delete_card', async (req, res) => {
+app.post('/delete_card', cors(corsOptions), async (req, res) => {
     const {card_id} = req.body;
     await client.query(DELETE_CARD_BY_ID, [card_id]);
     res.send('SUCCESS');
 });
 
-app.post('/delete_test', async (req, res) => {
+app.post('/delete_test', cors(corsOptions), async (req, res) => {
     const {test_id} = req.body;
     await client.query(DELETE_TEST_BY_ID, [test_id]);
     res.send('SUCCESS');
 });
 
-app.post('/registration', async (req, res) => {
+app.post('/registration', cors(corsOptions), async (req, res) => {
     const {login, password} = req.body;
     const userInfoResult = await client.query(SELECT_USER_BY_LOGIN_QUERY, [login]);
 
@@ -191,7 +233,7 @@ app.post('/registration', async (req, res) => {
     return res.send('SUCCESS');
 });
 
-app.post("/updatetest", async (req, res) => {
+app.post("/updatetest", cors(corsOptions), async (req, res) => {
     console.log(req.body);
     const {test_id, question, answer, type} = req.body;
     await client.query(UPDATE_TEST_QUESTION_BY_ID, [question, type === "qubic" ? 0 : 1, test_id]);
@@ -205,7 +247,7 @@ app.post("/updatetest", async (req, res) => {
     res.send('SUCCESS');
 });
 
-app.post("/gettest", async (req, res) => {
+app.post("/gettest", cors(corsOptions), async (req, res) => {
     const {test_id} = req.body;
     console.log(test_id)
     const test_info = await client.query(SELECT_TEST_BY_ID, [test_id]);
@@ -215,7 +257,7 @@ app.post("/gettest", async (req, res) => {
     res.json(test);
 });
 
-app.post('/createcard', async (req, res) => {
+app.post('/createcard', cors(corsOptions), async (req, res) => {
     const {title, description, imgUrl, tags} = req.body;
     const token = getTokenFromCookie(req);
 
@@ -244,18 +286,18 @@ app.post('/createcard', async (req, res) => {
     return res.send('SUCCESS');
 });
 
-app.get('/getalltags', async (req, res) => {
+app.get('/getalltags', cors(corsOptions), async (req, res) => {
     const tagsResult = await client.query(SELECT_ALL_TAGS_QUERY);
     return res.send(tagsResult.rows);
 })
 
-app.post('/get_tests', async (req, res) => {
+app.post('/get_tests', cors(corsOptions), async (req, res) => {
     const {id} = req.body;
     const tests_result = await client.query(SELECT_TESTS_BY_CARD_ID, [id]);
     return res.send(tests_result.rows);
 });
 
-app.post('/create_test', async (req, res) => {
+app.post('/create_test', cors(corsOptions), async (req, res) => {
     const {id} = req.body;
     await client.query(CREATE_TEST_QUERY, [id]);
     const tests_result = await client.query(SELECT_LAST_TEST_ID_BY_CARD_ID, [id]);
@@ -265,17 +307,39 @@ app.post('/create_test', async (req, res) => {
     await client.query(CREATE_TEST_ANSWER_QUERY, [false, tests_result.rows[0].id]);
     return res.send('OK');
 });
-
-app.get('/', (req, res) => {
-
-})
+app.post('/edit_card', cors(corsOptions), async (req, res) => {
+    const {
+        id,
+        title,
+        testCount,
+        imgUrl,
+        tags,
+        description
+    } = req.body;
+    // todo check that editor is owner of card
+    await client.query(UPDATE_CARD_BY_ID, [id, title, description, imgUrl]);
+    await client.query(DELETE_CARD_TAGS_BY_CARD_ID, [id]);
+    for (const tag of tags) {
+        let tag_info = await client.query(SELECT_TAG_BY_NAME_QUERY, [tag]);
+        if (tag_info.rows?.length) {
+            const tag_id = tag_info.rows[0].id;
+            await client.query(INSERT_TAG_TO_CARD_QUERY, [id, tag_id]);
+        } else {
+            await client.query(INSERT_TAG_QUERY, [tag]);
+            tag_info = await client.query(SELECT_TAG_BY_NAME_QUERY, [tag]);
+            const tag_id = tag_info.rows[0].id;
+            await client.query(INSERT_TAG_TO_CARD_QUERY, [id, tag_id]);
+        }
+    }
+    return res.send('OK');
+});
 
 https
-    .createServer( {
+    .createServer({
         key: fs.readFileSync("key.pem"),
         cert: fs.readFileSync("cert.pem"),
-    },app)
-    .listen(port, ()=>{
+    }, app)
+    .listen(port, () => {
         console.log(`Example app listening on http://localhost:${port}`)
     });
 

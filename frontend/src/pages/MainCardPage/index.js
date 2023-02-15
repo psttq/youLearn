@@ -82,6 +82,9 @@ const MainCardPage = () => {
 
 
     const handleMenuClick = ({key}) => {
+        if(key ==='1'){
+            navigate(`/card/edit/${id}`)
+        }
         if (key === '2') {
             Modal.confirm({
                 title: 'Вы уверены, что хотите удалить эту карточку?',

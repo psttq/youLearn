@@ -1,0 +1,39 @@
+.SetsContainer{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 80px;
+  padding-top: 15px;
+  justify-content: center;
+}
+
+.searchField{
+  height: auto;
+  box-shadow: rgba(194, 194, 194, 0.13) 3px 3px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+}
+
+.searchContainer{
+  width: 400px;}
+
+.categorySpan{
+  font-size: 15px;
+  margin-top: 30px;
+}
+
+.categoryContainer{
+  margin-top: 10px;
+  max-width: 800px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 150px;
+  overflow-y: scroll;
+}
+
+.Category:hover {
+  filter: brightness(150%);
+  cursor: pointer;
+
+}

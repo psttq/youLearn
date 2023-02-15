@@ -24,7 +24,7 @@ export const LoginPage = () => {
 
                     return;
                 }
-
+                
                 if(!setAuthCookies(token, expires)){
                     // TODO: Expiration date parsed incorrectly
                 }
