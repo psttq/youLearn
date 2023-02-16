@@ -6,7 +6,7 @@ import {useMutation, useQuery} from "react-query";
 import {stringToColour} from '../../Utils/utils';
 
 import {Button, Col, Divider, Dropdown, Image, Modal, Row, Tag, Typography} from "antd";
-import {notification, Space, Table} from "antd/lib";
+import {message, notification, Space, Table} from "antd/lib";
 import axios from "axios";
 import {API_URL} from "../../config";
 import {DownOutlined, LeftOutlined} from "@ant-design/icons";
@@ -37,6 +37,12 @@ const userItems = [
     },
 ];
 
+const userAddedItems = [
+    {
+        label: 'Удалить из коллекции',
+        key: '4',
+    },
+];
 
 
 let classicColumns = [
@@ -80,10 +86,49 @@ const MainCardPage = () => {
     const dispatch = useDispatch();
 
 
-
     const handleMenuClick = ({key}) => {
-        if(key ==='1'){
+        if (key === '1') {
             navigate(`/card/edit/${id}`)
+        }
+        if (key === '3') {
+            axios.post(`${API_URL}/addcard`, {card_id: id}).then(res => {
+                if (res.status === 200) {
+                    notification.success({
+                        message: `Успех`,
+                        description:
+                            "Карточка была успешно добавлена!",
+                        placement: "bottomRight",
+                    });
+                    getCardMutation.mutate();
+                }
+            }).catch(() => {
+                notification.error({
+                    message: `Ошибка`,
+                    description:
+                        "Возникла ошибка при добавлении карточки!",
+                    placement: "bottomRight",
+                });
+            })
+        }
+        if (key === '4') {
+            axios.post(`${API_URL}/removecard`, {card_id: id}).then(res => {
+                if (res.status === 200) {
+                    notification.success({
+                        message: `Успех`,
+                        description:
+                            "Карточка была успешно удалена из коллекции!",
+                        placement: "bottomRight",
+                    });
+                    getCardMutation.mutate();
+                }
+            }).catch(() => {
+                notification.error({
+                    message: `Ошибка`,
+                    description:
+                        "Возникла ошибка при удалении карточки из коллекции!",
+                    placement: "bottomRight",
+                });
+            })
         }
         if (key === '2') {
             Modal.confirm({
@@ -118,10 +163,15 @@ const MainCardPage = () => {
         onClick: handleMenuClick,
     };
 
+    const userAddedMenuProps = {
+        items: userAddedItems,
+        onClick: handleMenuClick,
+    };
+
 
     const [card, setCard] = useState({tags: []});
     const [tests, setTests] = useState([]);
-    const getCardsMutation = useMutation(['getTestMutation'], (id) => axios.post(`${API_URL}/get_tests`, {
+    const getTestsMutation = useMutation(['getTestMutation'], (id) => axios.post(`${API_URL}/get_tests`, {
             id: id,
         }).then(res => res.data),
         {
@@ -136,22 +186,26 @@ const MainCardPage = () => {
             }
         });
 
-
-    useEffect(() => {
-        getCardsMutation.mutate(id);
-        axios.post(`${API_URL}/card`, {
+    const getCardMutation = useMutation(()=>{
+        return  axios.post(`${API_URL}/card`, {
             card_id: id
         }).then(res => res.data).then(data => {
             console.log(data);
             setCard(data)
-        })
+        });
+    })
+
+
+    useEffect(() => {
+        getTestsMutation.mutate(id);
+        getCardMutation.mutate();
     }, [user])
 
 
     function createCard() {
         axios.post(`${API_URL}/create_test`, {
             id
-        }).then(() => getCardsMutation.mutate(id))
+        }).then(() => getTestsMutation.mutate(id))
     }
 
     let editColumns = [
@@ -186,7 +240,7 @@ const MainCardPage = () => {
                                             message: 'Вопрос успешно удален',
                                             placement: 'bottomRight'
                                         });
-                                        getCardsMutation.mutate(id);
+                                        getTestsMutation.mutate(id);
                                     })
                                     .catch(err => {
                                         if (err.response) {
@@ -214,8 +268,9 @@ const MainCardPage = () => {
                             icon={<LeftOutlined/>}/>
                     <Title>{card.title}</Title>
                     <div className={styles.optionsButtonContainer}>
-                        <Dropdown menu={user.user_id === card.creator_id ? authorMenuProps : userMenuProps}
-                                  className={styles.optionsMenu} placement="bottomLeft">
+                        <Dropdown
+                            menu={user.user_id === card.creator_id ? authorMenuProps : card.isadded ? userAddedMenuProps : userMenuProps}
+                            className={styles.optionsMenu} placement="bottomLeft">
                             <Button>
                                 <Space>
                                     <DownOutlined/>
@@ -259,8 +314,8 @@ const MainCardPage = () => {
                     </Row>
                     <div className={styles.TableContainer}>
                         <Table columns={user.user_id === card.creator_id ? editColumns : classicColumns}
-                               loading={getCardsMutation.isLoading}
-                               dataSource={getCardsMutation.isSuccess ? tests : []}/>
+                               loading={getTestsMutation.isLoading}
+                               dataSource={getTestsMutation.isSuccess ? tests : []}/>
                     </div>
                 </div>
             </div>

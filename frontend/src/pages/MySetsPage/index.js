@@ -8,6 +8,8 @@ import {stringToColour} from "../../Utils/utils";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {resetNotification, selectNotifications} from "../../redux/slices/notificationSlice";
+import {useMutation} from "react-query";
+import {ClipLoader} from "react-spinners";
 
 const {Title, Text} = Typography;
 
@@ -50,6 +52,16 @@ export const MySetsPage = () => {
     const [api, _] = notification.useNotification();
     const dispatch = useDispatch();
 
+    const getCardsMutation = useMutation(() => {
+        return axios.post(`${API_URL}/mycards`, {
+            name: searchParams.get('name'),
+            categories: Array.from(selectedTagsSet)
+        }).then(res => res.data).then(data => {
+            setCards(data)
+        })
+    });
+
+
     useEffect(() => {
 
         if (notifications.notify && notifications.target === "dashboard") {
@@ -61,23 +73,18 @@ export const MySetsPage = () => {
                     notifications.message,
                     placement: "bottomRight",
                 });
-            }
-            else
+            } else
                 notification.error({
                     message: `Ошибка`,
                     description:
                     notifications.message,
                     placement: "bottomRight",
                 });
+
             dispatch(resetNotification());
         }
 
-        axios.post(`${API_URL}/mycards`, {
-            name: searchParams.get('name'),
-            categories: Array.from(selectedTagsSet)
-        }).then(res => res.data).then(data => {
-            setCards(data)
-        })
+        getCardsMutation.mutate();
 
         console.log(searchParams.get('name'))
 
@@ -125,14 +132,15 @@ export const MySetsPage = () => {
                     }}
                 />
             </div>
-            <div className={styles.SetsContainer}>
-                {
-                    cards.length > 0 && cards.map(card => <CardPreview id={card.id} title={card.title}
-                                                                       imgUrl={card.img_url} key={card.id}
-                                                                       category={card.tags[0]}
-                                                                       testCount={card.test_count}/>)
-                }
-            </div>
+            {getCardsMutation.isLoading ? <div className={styles.LoaderContainer}><ClipLoader size={70}/></div> :
+                <div className={styles.SetsContainer}>
+                    {
+                        cards.length > 0 && cards.map(card => <CardPreview id={card.id} title={card.title}
+                                                                           imgUrl={card.img_url} key={card.id}
+                                                                           category={card.tags[0]}
+                                                                           testCount={card.test_count}/>)
+                    }
+                </div>}
         </div>
     );
 };

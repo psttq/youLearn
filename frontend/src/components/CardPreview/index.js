@@ -1,14 +1,15 @@
 import React from 'react';
-import {Card, Progress, Tag} from 'antd';
+import {Button, Card, Progress, Tag} from 'antd';
 import styles from "./style.module.css";
 import {useNavigate} from "react-router-dom";
 import {stringToColour} from "../../Utils/utils";
 import {Tooltip} from "antd/lib";
+import {CheckOutlined} from "@ant-design/icons";
 
 const {Meta} = Card;
 const exampleCategories = ["Математика", "Комплексные числа", "Введение в комплексный анализ", "ТФКП"]
 
-const CardPreview = ({id, title, testCount, progress, imgUrl, category}) => {
+const CardPreview = ({id, title, testCount, progress, imgUrl, category, isadded=false}) => {
     const navigate = useNavigate();
     category = category === undefined ? "Категория" : category;
     return (
@@ -32,14 +33,18 @@ const CardPreview = ({id, title, testCount, progress, imgUrl, category}) => {
                 onClick={() => {
                     navigate(`/card/${id}`)
                 }}
+                bodyStyle={{height: "45%", position: "relative"}}
                 cover={<img
                     src={imgUrl ? imgUrl : "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/F1_light_blue_flag.svg/2560px-F1_light_blue_flag.svg.png"}
                     style={{height: 160, borderBottomLeftRadius: "10%", borderBottomRightRadius: "10%"}}/>}
             >
                 <Meta title={title}/>
-                <div className={styles.progressContainer}>
-                    <Progress type="circle" percent={progress} strokeColor={{'0%': '#108ee9', '100%': '#87d068'}}
-                              width={80}/>
+                {/*<div className={styles.progressContainer}>*/}
+                {/*    <Progress type="circle" percent={progress} strokeColor={{'0%': '#108ee9', '100%': '#87d068'}}*/}
+                {/*              width={80}/>*/}
+                {/*</div>*/}
+                <div className={styles.footerInfo}>
+                    {isadded && <CheckOutlined color={"#5aff75"}  />}
                 </div>
             </Card>
         </div>

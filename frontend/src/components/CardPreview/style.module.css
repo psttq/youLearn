@@ -22,6 +22,12 @@
     font-size: 12px;
 }
 
+.footerInfo{
+    position: absolute;
+    bottom: 0;
+    right: 30px;
+}
+
 .progressContainer {
     margin-top: 20px;
     display: flex;
