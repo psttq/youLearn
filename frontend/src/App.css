@@ -35,8 +35,7 @@
 }
 .ant-btn:hover,
 .ant-btn:focus {
-    color: white !important;
-    border-color: white !important;
+
 }
 
 .ant-menu-item-selected {
@@ -60,8 +59,8 @@
 
 .ant-btn-primary {
     color: #fff;
-    border-color: #c64641 !important;
-    background: #d15f3a !important;
+    border-color: #e77731 !important;
+    background: linear-gradient(-45deg, #f56b5e, #e77731) !important;
 }
 
 .App-main {

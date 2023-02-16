@@ -31,7 +31,6 @@ const items = [
     getItem("Профиль", "mainprofile", <UserOutlined/>,
         [
             getItem("Страница", "profile", <StarOutlined/>),
-            getItem("Редактировать", "editprofile", <EditOutlined/>),
             getItem("Выйти", "logout", <LogoutOutlined/>)
         ]
     ),
@@ -42,7 +41,7 @@ const items = [
         getItem("Создать", "create", <PlusOutlined/>),
 
     ]),
-    getItem("Класс", "4", <ContainerOutlined/>),
+    getItem("Текущие", "current", <ContainerOutlined/>),
 ];
 
 export const MainMenu = () => {

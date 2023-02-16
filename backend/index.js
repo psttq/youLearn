@@ -47,6 +47,11 @@ const UPDATE_CARD_BY_ID = "UPDATE cards SET title=$2, description=$3, img_url=$4
 const DELETE_CARD_TAGS_BY_CARD_ID = "DELETE FROM card_tags WHERE card_id=$1";
 const ADD_CARD_TO_USER = "INSERT INTO card_user(card_id, user_id) VALUES($1, $2)";
 const REMOVE_CARD_FROM_USER = "DELETE FROM card_user WHERE card_id=$1 and user_id=$2";
+const INSERT_ATTEMPT = "INSERT INTO attempts(card_id, user_id) VALUES($1, $2)";
+const SELECT_LAST_ATTEMPT_ID = "SELECT id FROM attempts WHERE card_id=$1 and user_id=$2 ORDER BY id DESC LIMIT 1"
+const SELECT_CURRENT_ATTEMPTS = "SELECT attempts.id as attempt_id, start_time, c.* FROM attempts JOIN cards c on attempts.card_id = c.id WHERE start_time + INTERVAL '01:00' HOUR TO MINUTE > current_timestamp and user_id=$1"
+const SELECT_ATTEMPT =  "SELECT attempts.id as attempt_id, current_test, is_finished, progress, start_time, c.* FROM attempts JOIN cards c on attempts.card_id = c.id WHERE start_time + INTERVAL '01:00' HOUR TO MINUTE > current_timestamp and attempts.id=$1"
+const SELECT_TESTS_ID_BY_CARD_ID = "SELECT id FROM tests WHERE card_id=$1 ORDER BY id ASC";
 
 const corsOptions = {origin: "https://localhost:3000", credentials: true};
 
@@ -194,6 +199,47 @@ app.post('/addcard', cors(corsOptions), async (req, res) => {
     const {id: user_id} = (await client.query(SELECT_USER_BY_TOKEN_QUERY, [token]))?.rows[0];
     await client.query(ADD_CARD_TO_USER, [card_id, user_id]);
     res.send('SUCCESS');
+});
+
+app.post('/startattempt', cors(corsOptions), async (req, res) => {
+    const {card_id} = req.body;
+    const token = getTokenFromCookie(req);
+    const {id: user_id} = (await client.query(SELECT_USER_BY_TOKEN_QUERY, [token]))?.rows[0];
+    await client.query(INSERT_ATTEMPT, [card_id, user_id]);
+    const {id: attempt_id} = (await client.query(SELECT_LAST_ATTEMPT_ID, [card_id, user_id]))?.rows[0];
+    res.send({attempt_id});
+});
+
+app.post('/getcurrent', cors(corsOptions), async (req, res) => {
+    const token = getTokenFromCookie(req);
+    const {id: user_id} = (await client.query(SELECT_USER_BY_TOKEN_QUERY, [token]))?.rows[0];
+    let cards = await client.query(SELECT_CURRENT_ATTEMPTS, [user_id]);
+    cards = cards.rows;
+
+    for (let card of cards) {
+        let tags = await client.query(SELECT_TAGS_BY_CARD_ID, [card.id]);
+        const tests = await client.query(SELECT_TESTS_BY_CARD_ID, [card.id]);
+        card.test_count = tests.rows?.length;
+        tags = tags.rows.map(tag => tag.name);
+        card.tags = tags;
+    }
+
+    res.json(cards);
+});
+
+app.post('/getattempt', cors(corsOptions), async (req, res) => {
+    const {attempt_id} = req.body;
+    console.log("Getting attempt " + attempt_id);
+    let attempt = await client.query(SELECT_ATTEMPT, [attempt_id]);
+    if(attempt?.rows.length === 0) {
+        res.status(404);
+        res.send("NO SUCT ATTEMPT")
+        return;
+    }
+    attempt= attempt.rows[0];
+    let tests_info = await client.query(SELECT_TESTS_ID_BY_CARD_ID, [attempt.id]);
+    attempt.tests_id = tests_info.rows;
+    res.json(attempt);
 });
 
 app.post('/removecard', cors(corsOptions), async (req, res) => {

@@ -186,8 +186,8 @@ const MainCardPage = () => {
             }
         });
 
-    const getCardMutation = useMutation(()=>{
-        return  axios.post(`${API_URL}/card`, {
+    const getCardMutation = useMutation(() => {
+        return axios.post(`${API_URL}/card`, {
             card_id: id
         }).then(res => res.data).then(data => {
             console.log(data);
@@ -259,6 +259,18 @@ const MainCardPage = () => {
         },
     ];
 
+    const startCurrent = () => {
+        axios.post(`${API_URL}/startattempt`, {card_id: id}).then(res => {
+            if (res.status === 200)
+                navigate(`/attempt/${res.data.attempt_id}`);
+        }).catch(() =>
+            notification.error({
+                message: 'Ошибка при начале тестирования',
+                placement: 'bottomRight'
+            })
+        )
+    };
+
 
     return (
         <div className="App-main">
@@ -289,17 +301,24 @@ const MainCardPage = () => {
                             <span className={styles.CardAuthorText}>Автор:</span> {card.creator_login}
                         </Text>
                     </div>
-                    <Image
-                        className={styles.CardImage}
-                        width={250}
-                        src={card.img_url}
-                    />
-
+                    <div className={styles.ImageContainer}>
+                        <Image
+                            className={styles.CardImage}
+                            width={250}
+                            src={card.img_url}
+                        />
+                        <Button type="ghost" onClick={() => startCurrent()}  style={{marginTop: 20, borderColor: "#79ea84"}}>Начать
+                            тестирование</Button>
+                    </div>
                 </div>
+
                 <div className={styles.CardCategories}>
-                    <Title level={4}>Категории:</Title>
-                    <div className={styles.CardCategoriesContainer}>
-                        {card.tags.map((category, i) => <Tag color={stringToColour(category)} key={i}>{category}</Tag>)}
+                    <div>
+                        <Title level={4}>Категории:</Title>
+                        <div className={styles.CardCategoriesContainer}>
+                            {card.tags.map((category, i) => <Tag color={stringToColour(category)}
+                                                                 key={i}>{category}</Tag>)}
+                        </div>
                     </div>
                 </div>
                 <Divider/>

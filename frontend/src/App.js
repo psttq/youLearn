@@ -20,6 +20,7 @@ import {Provider} from "react-redux";
 import {store} from "./redux/store";
 import {MySetsPage} from "./pages/MySetsPage";
 import EditCardPage from "./pages/EditCardPage";
+import CurrentPage from "./pages/CurrentPage";
 
 
 function App() {
@@ -43,9 +44,10 @@ function App() {
                             <Route path="sets" element={<CardsDashboardPage/>}/>
                             <Route path="mysets" element={<MySetsPage/>}/>
                             <Route path="profile" element={<ProfilePage/>}/>
+                            <Route path="current" element={<CurrentPage/>}/>
                             <Route path="create" element={<CreateCardPage/>}/>
                             <Route path="card/:id" element={<MainCardPage/>}/>
-                            <Route path="test/:id" element={<TestMainPage/>}/>
+                            <Route path="attempt/:id" element={<TestMainPage/>}/>
                             <Route path="test/edit/:id" element={<TestEditPage/>}/>
                             <Route path="card/edit/:id" element={<EditCardPage/>}/>
                         </Route>
