@@ -26,10 +26,11 @@ function shuffle(array) {
 
 const Test = ({type, question, answers, onClick}) => {
     shuffle(answers);
+    console.log(type)
     return (
         <Card className={styles.TestCard} bodyStyle={{width: "100%", height: "100%"}} >
             <Title level={4}>{question}</Title>
-            <div className={ type === "qubic" ? styles.QubicAnswers : styles.VerticalAnswers} >
+            <div className={ type === 0 ? styles.QubicAnswers : styles.VerticalAnswers} >
                 {answers.map((answer, i) => <AnswerButton text={answer.text} id={answer.id} key={answer.id} onClick={(id)=>onClick(id)}/>)}
             </div>
         </Card>
