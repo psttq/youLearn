@@ -1,0 +1,41 @@
+.CardWrapper {
+}
+
+.CardInfo {
+    position: relative;
+    top: 30px;
+    left: 10px;
+    min-width: 70px;
+    z-index: 555;
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 20px 2px 2px;
+}
+
+.TestNumber {
+    background-color: white;
+    border-radius: 5px;
+    width: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+}
+
+.footerInfo{
+    position: absolute;
+    bottom: 0;
+    right: 30px;
+}
+
+.progressContainer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.Category{
+    max-width: 140px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}

@@ -11,7 +11,7 @@ import {
     RocketOutlined,
     StarOutlined,
     LogoutOutlined,
-    GitlabOutlined,
+    GitlabOutlined, AreaChartOutlined, RiseOutlined,
 } from "@ant-design/icons";
 import {Outlet, useNavigate} from "react-router-dom";
 
@@ -31,7 +31,7 @@ const items = [
     getItem("Профиль", "mainprofile", <UserOutlined/>,
         [
             getItem("Страница", "profile", <StarOutlined/>),
-            getItem("Выйти", "logout", <LogoutOutlined/>)
+            getItem("Выйти", "logout",  <LogoutOutlined/>)
         ]
     ),
     getItem("-", "-", undefined, undefined, "divider"),
@@ -41,7 +41,10 @@ const items = [
         getItem("Создать", "create", <PlusOutlined/>),
 
     ]),
-    getItem("Текущие", "current", <ContainerOutlined/>),
+    getItem("Прогресс", "progress", <RiseOutlined />, [
+        getItem("Текущие", "current", <ContainerOutlined/>),
+        getItem("Результаты", "results", <AreaChartOutlined/>),
+    ]),
 ];
 
 export const MainMenu = () => {

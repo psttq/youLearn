@@ -307,8 +307,9 @@ const MainCardPage = () => {
                             width={250}
                             src={card.img_url}
                         />
-                        <Button type="ghost" onClick={() => startCurrent()}  style={{marginTop: 20, borderColor: "#79ea84"}}>Начать
-                            тестирование</Button>
+                        {card.isadded && <Button type="ghost" onClick={() => startCurrent()}
+                                 style={{marginTop: 20, borderColor: "#79ea84"}}>Начать
+                            тестирование</Button>}
                     </div>
                 </div>
 

@@ -8,8 +8,7 @@ function isPublicPage (url) {
 const SELECT_EXPIRATION_DATE_QUERY = 'SELECT expiration_date FROM tokens WHERE token = $1';
 
 function returnFailResponse (res, message, redirect) {
-    res.status(403);
-    return res.json({ success: false, message, redirect });
+    return res.json({ auth: false, message, redirect });
 }
 
 
@@ -23,13 +22,13 @@ function tokenMiddleware (dbClient) {
 
         const token = req.cookies?.token;
 
-        console.log(JSON.stringify(token));
-
+        // console.log(JSON.stringify(token));
+        //
         if (!token)
             return returnFailResponse(res, 'Token is not defined', `${ CLIENT_URL }/login`);
 
         const result = await dbClient.query(SELECT_EXPIRATION_DATE_QUERY, [token]);
-
+        //
         if (!result.rows?.length)
             return returnFailResponse(res, 'Session is expired', `${ CLIENT_URL }/login`);
 

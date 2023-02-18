@@ -67,7 +67,8 @@ function CreateCardPage(props) {
         title: "Title",
         testCount: 4,
         imgUrl: undefined,
-        tags: ["Категория"]
+        tags: ["Категория"],
+        description: "Описание"
     });
 
     let onFormChanged = (changedFields) => {
@@ -122,7 +123,7 @@ function CreateCardPage(props) {
                                 label="Название"
                                 name="title"
                                 required={true}
-
+                                initialValue="Название карточки"
                             >
                                 <Input/>
                             </Form.Item>
@@ -131,6 +132,8 @@ function CreateCardPage(props) {
                                 label="Описание"
                                 name="description"
                                 required={true}
+                                initialValue="Описание"
+
                             >
                                 <Input.TextArea/>
                             </Form.Item>

@@ -9,6 +9,7 @@ import axios from "axios";
 import AttemptPreview from "../../components/AttemptPreview";
 import {ClipLoader} from "react-spinners";
 import {BugOutlined} from "@ant-design/icons";
+import ResultPreview from "../../components/ResultPreview";
 const {Title, Text} = Typography;
 
 
@@ -17,14 +18,16 @@ function CurrentPage(props) {
     const navigate = useNavigate();
     const [cards, setCards] = useState([]);
 
-    const getCurrentMutation = useMutation(()=>{
-        return axios.post(`${API_URL}/getcurrent`, {}).then(res => res.data).then(data =>
-            setCards(data)
+    const getResultsMutation = useMutation(()=>{
+        return axios.post(`${API_URL}/getresult`, {}).then(res => res.data).then(data => {
+                setCards(data);
+                console.log(data)
+            }
         )
     })
 
     useEffect(() => {
-        getCurrentMutation.mutate();
+        getResultsMutation.mutate();
 
     }, []);
 
@@ -33,16 +36,16 @@ function CurrentPage(props) {
     return (
         <div className="App-main">
             <div className={styles.currentAttemptsContainer}>
-                <Title>Текущие попытки:</Title>
-                {getCurrentMutation.isLoading ? <div className={styles.LoaderContainer}><ClipLoader size={70}/></div> : <div className={styles.SetsContainer}>
+                <Title>Результаты:</Title>
+                {getResultsMutation.isLoading ? <div className={styles.LoaderContainer}><ClipLoader size={70}/></div> : <div className={styles.SetsContainer}>
                     {
-                        cards.length > 0 ? cards.map(card => <AttemptPreview id={card.id} title={card.title}
+                        cards.length > 0 ? cards.map(card => <ResultPreview id={card.id} title={card.title}
                                                                               imgUrl={card.img_url}
                                                                               key={card.attempt_id}
                                                                               category={card.tags[0]}
                                                                               testCount={card.test_count}
                                                                               attempt_id={card.attempt_id}
-                                                                              start_time={card.start_time}
+                                                                            result={card.result}
                         />
                         ) :
                             <div className={styles.NoCurrent}>

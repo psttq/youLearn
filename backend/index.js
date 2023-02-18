@@ -49,9 +49,16 @@ const ADD_CARD_TO_USER = "INSERT INTO card_user(card_id, user_id) VALUES($1, $2)
 const REMOVE_CARD_FROM_USER = "DELETE FROM card_user WHERE card_id=$1 and user_id=$2";
 const INSERT_ATTEMPT = "INSERT INTO attempts(card_id, user_id) VALUES($1, $2)";
 const SELECT_LAST_ATTEMPT_ID = "SELECT id FROM attempts WHERE card_id=$1 and user_id=$2 ORDER BY id DESC LIMIT 1"
-const SELECT_CURRENT_ATTEMPTS = "SELECT attempts.id as attempt_id, start_time, c.* FROM attempts JOIN cards c on attempts.card_id = c.id WHERE start_time + INTERVAL '01:00' HOUR TO MINUTE > current_timestamp and user_id=$1"
-const SELECT_ATTEMPT =  "SELECT attempts.id as attempt_id, current_test, is_finished, progress, start_time, c.* FROM attempts JOIN cards c on attempts.card_id = c.id WHERE start_time + INTERVAL '01:00' HOUR TO MINUTE > current_timestamp and attempts.id=$1"
+const SELECT_CURRENT_ATTEMPTS = "SELECT attempts.id as attempt_id, start_time, c.* FROM attempts JOIN cards c on attempts.card_id = c.id WHERE start_time + INTERVAL '01:00' HOUR TO MINUTE > current_timestamp and user_id=$1 and is_finished=false"
+const SELECT_ATTEMPT = "SELECT attempts.id as attempt_id, current_test, is_finished, progress, start_time, c.* FROM attempts JOIN cards c on attempts.card_id = c.id WHERE start_time + INTERVAL '01:00' HOUR TO MINUTE > current_timestamp and attempts.id=$1"
 const SELECT_TESTS_ID_BY_CARD_ID = "SELECT id FROM tests WHERE card_id=$1 ORDER BY id ASC";
+const INSERT_ATTEMPT_ANSWER = "INSERT INTO attempt_answers(attempt_id, test_id, answer_id) VALUES($1, $2, $3)"
+const UPDATE_ATTEMPT_CURRENT_TEST = "UPDATE attempts SET current_test=current_test+1 WHERE id=$1";
+const UPDATE_ATTEMPT_FINISHED = "UPDATE attempts SET is_finished=true WHERE id=$1";
+const SELECT_RESULT_ATTEMPTS = "SELECT attempts.id as attempt_id, start_time, c.* FROM attempts JOIN cards c on attempts.card_id = c.id WHERE (start_time + INTERVAL '01:00' HOUR TO MINUTE <= current_timestamp or  is_finished=true) and user_id=$1"
+const SELECT_RIGHT_ATTEMPT_ANSWERS_COUNT = "SELECT SUM(is_correct::int) from attempt_answers JOIN test_answers ON attempt_answers.answer_id = test_answers.id WHERE attempt_id=$1";
+const SELECT_LATEST_RESULT_ATTEMPTS = "SELECT attempts.id as attempt_id, start_time, c.* FROM attempts JOIN cards c on attempts.card_id = c.id WHERE (start_time + INTERVAL '01:00' HOUR TO MINUTE <= current_timestamp or  is_finished=true) and user_id=$1  and start_time in (select max(start_time) from attempts GROUP BY card_id)"
+
 
 const corsOptions = {origin: "https://localhost:3000", credentials: true};
 
@@ -119,6 +126,23 @@ app.get('/user-info', cors(corsOptions), async (req, res) => {
     data.token = token_info.rows[0].token;
     data.expires = token_info.rows[0].expiration_date;
     res.json(data);
+});
+
+app.post('/checkauth', cors(corsOptions), async (req, res) => {
+    const token = getTokenFromCookie(req);
+    if(!token)
+        return res.send({auth: false})
+
+
+    const {id, login, 'avatar_url': avatarUrl} = (await client.query(SELECT_USER_BY_TOKEN_QUERY, [token]))?.rows[0];
+    const token_info = await client.query(SELECT_TOKEN_QUERY, [id]);
+    let expires = token_info.rows[0].expiration_date;
+    console.log("checkauth")
+    if(Date.parse(expires) < Date.now())
+    {
+        res.send({auth: false})
+    }
+    res.send({auth: true});
 });
 
 app.post('/cards', cors(corsOptions), async (req, res) => {
@@ -227,19 +251,68 @@ app.post('/getcurrent', cors(corsOptions), async (req, res) => {
     res.json(cards);
 });
 
+app.post('/getresult', cors(corsOptions), async (req, res) => {
+    const token = getTokenFromCookie(req);
+    const {id: user_id} = (await client.query(SELECT_USER_BY_TOKEN_QUERY, [token]))?.rows[0];
+    let cards = await client.query(SELECT_LATEST_RESULT_ATTEMPTS, [user_id]);
+    cards = cards.rows;
+
+
+    for (let card of cards) {
+        let tags = await client.query(SELECT_TAGS_BY_CARD_ID, [card.id]);
+        const tests = await client.query(SELECT_TESTS_BY_CARD_ID, [card.id]);
+        card.test_count = tests.rows?.length;
+        tags = tags.rows.map(tag => tag.name);
+        card.tags = tags;
+        let tests_info = await client.query(SELECT_TESTS_ID_BY_CARD_ID, [card.id])
+        let right_count = await client.query(SELECT_RIGHT_ATTEMPT_ANSWERS_COUNT, [card.attempt_id])
+        right_count = right_count.rows[0].sum;
+        if(right_count) {
+            console.log(right_count, tests_info.rows.length)
+            card.result = right_count / tests_info.rows.length * 100;
+        }
+        else
+            card.result = 0;
+    }
+
+    res.json(cards);
+});
+
 app.post('/getattempt', cors(corsOptions), async (req, res) => {
     const {attempt_id} = req.body;
     console.log("Getting attempt " + attempt_id);
     let attempt = await client.query(SELECT_ATTEMPT, [attempt_id]);
-    if(attempt?.rows.length === 0) {
+    if (attempt?.rows.length === 0) {
         res.status(404);
         res.send("NO SUCT ATTEMPT")
         return;
     }
-    attempt= attempt.rows[0];
+    attempt = attempt.rows[0];
     let tests_info = await client.query(SELECT_TESTS_ID_BY_CARD_ID, [attempt.id]);
     attempt.tests_id = tests_info.rows;
     res.json(attempt);
+});
+
+app.post('/attemptanswer', cors(corsOptions), async (req, res) => {
+    const {attempt_id, test_id, answer_id} = req.body;
+
+    let attempt = await client.query(SELECT_ATTEMPT, [attempt_id]);
+    if (attempt?.rows.length === 0) {
+        res.status(404);
+        res.send("NO SUCT ATTEMPT")
+        return;
+    }
+    attempt = attempt.rows[0];
+
+    let tests_info = await client.query(SELECT_TESTS_ID_BY_CARD_ID, [attempt.id]);
+
+    await client.query(INSERT_ATTEMPT_ANSWER, [attempt_id, test_id, answer_id]);
+
+    if (attempt.current_test === tests_info.rows.length - 1)
+        await client.query(UPDATE_ATTEMPT_FINISHED, [attempt_id]);
+
+    await client.query(UPDATE_ATTEMPT_CURRENT_TEST, [attempt_id]);
+    res.send('SUCCESS');
 });
 
 app.post('/removecard', cors(corsOptions), async (req, res) => {

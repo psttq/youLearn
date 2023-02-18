@@ -1,6 +1,6 @@
 import "./App.css";
 
-import React from "react";
+import React, {useEffect} from "react";
 import {Route, Routes} from "react-router-dom";
 import {MainPage} from "./pages/MainPage";
 import {CardsDashboardPage} from "./pages/CardsDashboardPage";
@@ -21,6 +21,11 @@ import {store} from "./redux/store";
 import {MySetsPage} from "./pages/MySetsPage";
 import EditCardPage from "./pages/EditCardPage";
 import CurrentPage from "./pages/CurrentPage";
+import ResultsPage from "./pages/ResultsPage";
+import {API_URL} from "./config";
+import {useLocation, useNavigate} from "react-router";
+import axios from "axios";
+import Logout from "./pages/logout";
 
 
 function App() {
@@ -31,7 +36,29 @@ function App() {
                 retry: 0
             },
         },
-    })
+    });
+    let location = useLocation();
+
+    const whitelist = ['/login', '/register', '/']
+    const navigate = useNavigate();
+    useEffect(() => {
+        axios.post(`${API_URL}/checkauth`, {}).then(res =>{
+            if(res.status === 200){
+                if(!res.data.auth)
+                    if(!(location.pathname in whitelist))
+                        navigate("/");
+            }
+            else{
+                if(!(location.pathname in whitelist))
+                    navigate("/");
+            }
+        }).catch(()=>{
+            if(!(location.pathname in whitelist))
+                navigate("/");
+        })
+    }, []);
+
+
     return (
         <QueryClientProvider client={queryClient}>
             <Provider store={store}>
@@ -45,11 +72,13 @@ function App() {
                             <Route path="mysets" element={<MySetsPage/>}/>
                             <Route path="profile" element={<ProfilePage/>}/>
                             <Route path="current" element={<CurrentPage/>}/>
+                            <Route path="results" element={<ResultsPage/>}/>
                             <Route path="create" element={<CreateCardPage/>}/>
                             <Route path="card/:id" element={<MainCardPage/>}/>
                             <Route path="attempt/:id" element={<TestMainPage/>}/>
                             <Route path="test/edit/:id" element={<TestEditPage/>}/>
                             <Route path="card/edit/:id" element={<EditCardPage/>}/>
+                            <Route path="logout" element={<Logout/>}/>
                         </Route>
                     </Routes>
                 </div>
