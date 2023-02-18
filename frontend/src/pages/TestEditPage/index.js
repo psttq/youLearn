@@ -34,7 +34,7 @@ const TestEditPage = (props) => {
         return axios.post(`${API_URL}/gettest`, {test_id: test_id}).then(res => {
             let newFieldValues = {...fieldValues};
             newFieldValues.question = res.data.question
-            newFieldValues.answers = res.data;
+            newFieldValues.answers = res.data.answers.map(answer => answer.text);
             newFieldValues.type = res.data.type === 0 ? "qubic" : "vertical";
             setFieldValues(newFieldValues);
         }).catch(err => {
@@ -158,7 +158,7 @@ const TestEditPage = (props) => {
                     <div className={styles.TestBox}>
                         <Title level={3}>Превью:</Title>
                         <TestPreview type={fieldValues.type} question={fieldValues.question}
-                                     answers={fieldValues.answers}/>
+                                     answers={fieldValues.answers }/>
                     </div>
                 </div>}
         </div>
