@@ -80,8 +80,8 @@ const exampleCategories = ["Математика", "Комплексные чи�
 
 const MainCardPage = () => {
     let {id} = useParams();
-    let u = useUser();
-    const user = useSelector(selectUser);
+    // let u = useUser();
+    // const user = useSelector(selectUser);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -170,6 +170,7 @@ const MainCardPage = () => {
 
 
     const [card, setCard] = useState({tags: []});
+    const [user, setUser] = useState({});
     const [tests, setTests] = useState([]);
     const getTestsMutation = useMutation(['getTestMutation'], (id) => axios.post(`${API_URL}/get_tests`, {
             id: id,
@@ -199,8 +200,12 @@ const MainCardPage = () => {
     useEffect(() => {
         getTestsMutation.mutate(id);
         getCardMutation.mutate();
+
     }, [user])
 
+    useEffect(()=> {
+        axios.get(`${API_URL}/user-info`).then(res => setUser(res.data));
+    },[]);
 
     function createCard() {
         axios.post(`${API_URL}/create_test`, {

@@ -95,7 +95,7 @@ const TestMainPage = (props) => {
                         <Button danger ghost>Назад</Button>
                         <Button danger ghost>Пропустить</Button>
                     </div>
-                    <Progress style={{marginTop: 40}} percent={currentTestNumber/attempt.tests_id?.length*100} status="active"
+                    <Progress style={{marginTop: 40}} percent={Math.floor(currentTestNumber/attempt.tests_id?.length*100)} status="active"
                               strokeColor={{from: '#108ee9', to: '#87d068'}}/>
                     <div className={styles.TestBox}>
                         {getTestMutation.isLoading ? <div className={styles.LoaderContainer}><ClipLoader size={70}/></div> :

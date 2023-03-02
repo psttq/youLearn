@@ -132,8 +132,6 @@ app.post('/checkauth', cors(corsOptions), async (req, res) => {
     const token = getTokenFromCookie(req);
     if(!token)
         return res.send({auth: false})
-
-
     const {id, login, 'avatar_url': avatarUrl} = (await client.query(SELECT_USER_BY_TOKEN_QUERY, [token]))?.rows[0];
     const token_info = await client.query(SELECT_TOKEN_QUERY, [id]);
     let expires = token_info.rows[0].expiration_date;
@@ -329,6 +327,8 @@ app.post('/card', cors(corsOptions), async (req, res) => {
 
     const token = getTokenFromCookie(req);
     const {id: user_id} = (await client.query(SELECT_USER_BY_TOKEN_QUERY, [token]))?.rows[0];
+
+    console.log("user - " +  user_id);
 
     let card_info = await client.query(SELECT_CARD_BY_ID, [card_id, user_id]);
     console.log(card_info.rows.length)

@@ -45,7 +45,7 @@ function CurrentPage(props) {
                                                                               category={card.tags[0]}
                                                                               testCount={card.test_count}
                                                                               attempt_id={card.attempt_id}
-                                                                            result={card.result}
+                                                                            result={Math.floor(card.result)}
                         />
                         ) :
                             <div className={styles.NoCurrent}>
