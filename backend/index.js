@@ -21,11 +21,11 @@ const INSERT_USER_QUERY = 'INSERT INTO users(login, password) VALUES($1, $2)';
 const SELECT_USER_BY_TOKEN_QUERY = 'SELECT * FROM tokens JOIN users ON users.id = user_id WHERE token = $1';
 const SELECT_USER_BY_ID = 'SELECT login FROM users WHERE id = $1';
 const INSERT_CARD_QUERY = 'INSERT INTO cards(title, description, img_url, creator_id) VALUES($1, $2, $3, $4)';
-const SELECT_ALL_CARDS_QUERY = 'SELECT cards.*, (case when user_id is null then false or creator_id=$1 else user_id=$1 end) as isadded FROM cards LEFT OUTER JOIN card_user cu on cards.id = cu.card_id';
+const SELECT_ALL_CARDS_QUERY = 'SELECT cards.*, (case when user_id is null then false or creator_id=$1 else user_id=$1 end) as isadded FROM cards LEFT OUTER JOIN card_user cu on cards.id = cu.card_id and user_id=$1';
 const SELECT_ALL_MY_CARDS_QUERY = ' SELECT cards.* fROM cards WHERE creator_id=$1 UNION SELECT cards.* fROM cards JOIN card_user cu on cards.id = cu.card_id WHERE user_id=$1';
 const SELECT_ALL_TAGS_QUERY = 'SELECT * FROM tags';
 const SELECT_CARD_BY_TITLE_QUERY = 'SELECT id FROM cards WHERE title=$1';
-const SELECT_CARD_BY_ID = 'SELECT cards.*, (case when user_id is null then false or creator_id=$2 else user_id=$2 end) as isadded FROM cards LEFT OUTER JOIN card_user cu on cards.id = cu.card_id WHERE id = $1';
+const SELECT_CARD_BY_ID = 'SELECT cards.*, (case when user_id is null then false or creator_id=$2 else user_id=$2 end) as isadded FROM cards LEFT OUTER JOIN card_user cu on cards.id = cu.card_id  and user_id=$2 WHERE id = $1';
 const SELECT_TAG_BY_NAME_QUERY = 'SELECT id FROM tags WHERE name=$1';
 const INSERT_TAG_QUERY = 'INSERT INTO tags(name) VALUES($1)';
 const INSERT_TAG_TO_CARD_QUERY = 'INSERT INTO card_tags(card_id, tag_id) VALUES($1, $2)';
@@ -39,7 +39,7 @@ const UPDATE_TEST_QUESTION_BY_ID = "UPDATE tests SET question = $1, type = $2 WH
 const SELECT_ALL_TEST_ANSWERS_BY_TEST_ID = "SELECT * FROM test_answers WHERE test_id = $1";
 const UPDATE_TEST_ANSWER_BY_ID = "UPDATE test_answers SET text = $1, is_correct = $2 WHERE id = $3";
 const SELECT_TEST_BY_ID = "SELECT * FROM tests WHERE id = $1";
-const SELECT_ALL_CARDS_BY_NAME = "SELECT cards.*, (case when user_id is null then false or creator_id=$2 else user_id=$2 end) as isadded FROM cards LEFT OUTER JOIN card_user cu on cards.id = cu.card_id WHERE title LIKE $1";
+const SELECT_ALL_CARDS_BY_NAME = "SELECT cards.*, (case when user_id is null then false or creator_id=$2 else user_id=$2 end) as isadded FROM cards LEFT OUTER JOIN card_user cu on cards.id = cu.card_id  and user_id=$2 WHERE title LIKE $1";
 const SELECT_ALL_MY_CARDS_BY_NAME = " SELECT cards.* fROM cards WHERE creator_id=$2 and title LIKE $1 UNION SELECT cards.* fROM cards JOIN card_user cu on cards.id = cu.card_id WHERE user_id=$2 and title LIKE $1";
 const DELETE_CARD_BY_ID = "DELETE FROM cards WHERE id = $1";
 const DELETE_TEST_BY_ID = "DELETE FROM tests WHERE id = $1";
@@ -157,7 +157,7 @@ app.post('/cards', cors(corsOptions), async (req, res) => {
     if (categories?.length) {
         let categoriesString = `(${categories.join(', ')})`
         console.log(categoriesString)
-        const query = `SELECT cards.*, (case when user_id is null then false or creator_id=${user_id} else user_id=${user_id} end) as isadded FROM cards LEFT OUTER JOIN card_user cu on cards.id = cu.card_id JOIN card_tags ON cards.id = card_tags.card_id WHERE tag_id IN ${categoriesString} ${name ? `AND title LIKE '%${name}%'` : ""}`;
+        const query = `SELECT cards.*, (case when user_id is null then false or creator_id=${user_id} else user_id=${user_id} end) as isadded FROM cards LEFT OUTER JOIN card_user cu on cards.id = cu.card_id  and user_id=${user_id} JOIN card_tags ON cards.id = card_tags.card_id WHERE tag_id IN ${categoriesString} ${name ? `AND title LIKE '%${name}%'` : ""}`;
         console.log(query)
         cards = await client.query(query);
     } else {
