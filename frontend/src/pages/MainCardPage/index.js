@@ -170,7 +170,7 @@ const MainCardPage = () => {
 
 
     const [card, setCard] = useState({tags: []});
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState({user_id: -1});
     const [tests, setTests] = useState([]);
     const getTestsMutation = useMutation(['getTestMutation'], (id) => axios.post(`${API_URL}/get_tests`, {
             id: id,
@@ -198,8 +198,10 @@ const MainCardPage = () => {
 
 
     useEffect(() => {
-        getTestsMutation.mutate(id);
-        getCardMutation.mutate();
+        if(user.user_id !== -1) {
+            getTestsMutation.mutate(id);
+            getCardMutation.mutate();
+        }
 
     }, [user])
 
