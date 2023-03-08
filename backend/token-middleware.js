@@ -1,11 +1,12 @@
-const { CLIENT_URL } = require('../frontend/src/config');
 const PUBLIC_PAGES   = ['login', 'registration'];
 
 function isPublicPage (url) {
     return PUBLIC_PAGES.some(p => url.includes(p));
 }
 
-const SELECT_EXPIRATION_DATE_QUERY = 'SELECT expiration_date FROM tokens WHERE token = $1';
+const CLIENT_URL = 'http://localhost:3000';
+
+const SELECT_EXPIRATION_DATE_QUERY = 'SELECT expiration_date FROM youlearn_tokens WHERE token = $1';
 
 function returnFailResponse (res, message, redirect) {
     return res.json({ auth: false, message, redirect });

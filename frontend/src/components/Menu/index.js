@@ -1,5 +1,5 @@
 import {Button, Col, Layout, Menu, Row} from "antd";
-import React, {useLayoutEffect, useState} from "react";
+import React, {useEffect, useLayoutEffect, useState} from "react";
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
@@ -11,9 +11,11 @@ import {
     RocketOutlined,
     StarOutlined,
     LogoutOutlined,
-    GitlabOutlined, AreaChartOutlined, RiseOutlined,
+    GitlabOutlined, AreaChartOutlined, RiseOutlined, TeamOutlined, LockOutlined,
 } from "@ant-design/icons";
 import {Outlet, useNavigate} from "react-router-dom";
+import axios from "axios";
+import {API_URL} from "../../config";
 
 const {Header, Sider, Content} = Layout;
 
@@ -27,11 +29,11 @@ function getItem(label, key, icon, children, type) {
     };
 }
 
-const items = [
+const initial_items = [
     getItem("Профиль", "mainprofile", <UserOutlined/>,
         [
             getItem("Страница", "profile", <StarOutlined/>),
-            getItem("Выйти", "logout",  <LogoutOutlined/>)
+            getItem("Выйти", "logout", <LogoutOutlined/>)
         ]
     ),
     getItem("-", "-", undefined, undefined, "divider"),
@@ -41,21 +43,37 @@ const items = [
         getItem("Создать", "create", <PlusOutlined/>),
 
     ]),
-    getItem("Прогресс", "progress", <RiseOutlined />, [
+    getItem("Прогресс", "progress", <RiseOutlined/>, [
         getItem("Текущие", "current", <ContainerOutlined/>),
         getItem("Результаты", "results", <AreaChartOutlined/>),
     ]),
+
 ];
 
 export const MainMenu = () => {
     const [collapsed, setCollapsed] = useState(false);
 
     const navigate = useNavigate();
-
+    const [user, setUser] = useState({});
+    const [items, setItems] = useState(initial_items)
 
     const toggleCollapsed = () => {
         setCollapsed(!collapsed);
     };
+
+    useEffect(() => {
+        axios.get(`${API_URL}/user-info`).then(res => res.data).then((user) => {
+            console.log(user)
+            if (user.is_admin) {
+                let new_items = [...initial_items];
+                new_items.push(getItem("Админ", "admin", <LockOutlined/>, [
+                    getItem("Пользователи", "admin/users", <TeamOutlined/>),
+                ]))
+                setItems(new_items);
+            }
+        });
+    }, []);
+
 
     const onMenuItemClicked = (item) => {
         let key = item.key;

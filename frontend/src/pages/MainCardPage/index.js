@@ -90,6 +90,9 @@ const MainCardPage = () => {
         if (key === '1') {
             navigate(`/card/edit/${id}`)
         }
+        if (key === '5') {
+            navigate(`/card/results/${id}`)
+        }
         if (key === '3') {
             axios.post(`${API_URL}/addcard`, {card_id: id}).then(res => {
                 if (res.status === 200) {
@@ -195,19 +198,34 @@ const MainCardPage = () => {
             setCard(data)
         });
     })
+    const [currentItems, setCurrentItems] = useState({})
 
 
     useEffect(() => {
-        if(user.user_id !== -1) {
+        if (user.user_id !== -1) {
             getTestsMutation.mutate(id);
             getCardMutation.mutate();
         }
-
     }, [user])
 
-    useEffect(()=> {
+    useEffect(() => {
+            let items = (user.user_id === card.creator_id ? authorMenuProps : card.isadded ? userAddedMenuProps : userMenuProps);
+            if (user.is_admin) {
+               let find = items.items.find(v => v.key === '5');
+               if(!find)
+                items.items.push({
+                    label: 'Посмотреть результаты',
+                    key: '5',
+                },);
+            }
+            console.log(items)
+            setCurrentItems(items);
+        }, [card]
+    );
+
+    useEffect(() => {
         axios.get(`${API_URL}/user-info`).then(res => setUser(res.data));
-    },[]);
+    }, []);
 
     function createCard() {
         axios.post(`${API_URL}/create_test`, {
@@ -288,7 +306,7 @@ const MainCardPage = () => {
                     <Title>{card.title}</Title>
                     <div className={styles.optionsButtonContainer}>
                         <Dropdown
-                            menu={user.user_id === card.creator_id ? authorMenuProps : card.isadded ? userAddedMenuProps : userMenuProps}
+                            menu={currentItems}
                             className={styles.optionsMenu} placement="bottomLeft">
                             <Button>
                                 <Space>
@@ -315,7 +333,7 @@ const MainCardPage = () => {
                             src={card.img_url}
                         />
                         {card.isadded && <Button type="ghost" onClick={() => startCurrent()}
-                                 style={{marginTop: 20, borderColor: "#79ea84"}}>Начать
+                                                 style={{marginTop: 20, borderColor: "#79ea84"}}>Начать
                             тестирование</Button>}
                     </div>
                 </div>

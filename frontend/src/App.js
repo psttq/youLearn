@@ -26,6 +26,8 @@ import {API_URL} from "./config";
 import {useLocation, useNavigate} from "react-router";
 import axios from "axios";
 import Logout from "./pages/logout";
+import UsersPage from "./pages/UsersPage_ADMIN";
+import AllResultsPage from "./pages/AllResultsPage";
 
 
 function App() {
@@ -75,9 +77,11 @@ function App() {
                             <Route path="results" element={<ResultsPage/>}/>
                             <Route path="create" element={<CreateCardPage/>}/>
                             <Route path="card/:id" element={<MainCardPage/>}/>
+                            <Route path="card/results/:id" element={<AllResultsPage/>}/>
                             <Route path="attempt/:id" element={<TestMainPage/>}/>
                             <Route path="test/edit/:id" element={<TestEditPage/>}/>
                             <Route path="card/edit/:id" element={<EditCardPage/>}/>
+                            <Route path="admin/users" element={<UsersPage/>}/>
                             <Route path="logout" element={<Logout/>}/>
                         </Route>
                     </Routes>
