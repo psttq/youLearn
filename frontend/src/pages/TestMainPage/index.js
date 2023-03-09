@@ -99,7 +99,7 @@ const TestMainPage = (props) => {
                               strokeColor={{from: '#108ee9', to: '#87d068'}}/>
                     <div className={styles.TestBox}>
                         {getTestMutation.isLoading ? <div className={styles.LoaderContainer}><ClipLoader size={70}/></div> :
-                            <Test type={currentTest.type} question={currentTest.question} onClick={answerButtonClicked}
+                            <Test type={currentTest.type} question={currentTest.question} onClick={answerButtonClicked} image={currentTest.image}
                                   answers={currentTest.answers ? currentTest.answers : []}/>}
                     </div>
                 </>}

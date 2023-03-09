@@ -34,6 +34,7 @@ const TestEditPage = (props) => {
         return axios.post(`${API_URL}/gettest`, {test_id: test_id}).then(res => {
             let newFieldValues = {...fieldValues};
             newFieldValues.question = res.data.question
+            newFieldValues.image = res.data.image
             newFieldValues.answers = res.data.answers.map(answer => answer.text);
             newFieldValues.type = res.data.type === 0 ? "qubic" : "vertical";
             setFieldValues(newFieldValues);
@@ -108,6 +109,15 @@ const TestEditPage = (props) => {
                             </Form.Item>
 
                             <Form.Item
+                                label="Картинка"
+                                name="image"
+                                required={true}
+                                initialValue={fieldValues.image}
+                            >
+                                <Input.TextArea/>
+                            </Form.Item>
+
+                            <Form.Item
                                 label="Правильный ответ"
                                 name={["answer", 0]}
                                 required={true}
@@ -158,7 +168,7 @@ const TestEditPage = (props) => {
                     <div className={styles.TestBox}>
                         <Title level={3}>Превью:</Title>
                         <TestPreview type={fieldValues.type} question={fieldValues.question}
-                                     answers={fieldValues.answers }/>
+                                     answers={fieldValues.answers} image={fieldValues.image}/>
                     </div>
                 </div>}
         </div>

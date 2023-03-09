@@ -35,7 +35,7 @@ const SELECT_TESTS_BY_CARD_ID = 'SELECT * FROM youlearn_tests WHERE card_id = $1
 const CREATE_TEST_QUERY = "INSERT INTO youlearn_tests(card_id, question) VALUES($1, 'Вопрос?')";
 const CREATE_TEST_ANSWER_QUERY = "INSERT INTO youlearn_test_answers(text, is_correct, test_id) VALUES('Ответ', $1, $2)";
 const SELECT_LAST_TEST_ID_BY_CARD_ID = "SELECT id FROM youlearn_tests WHERE card_id = $1 ORDER BY id DESC LIMIT 1";
-const UPDATE_TEST_QUESTION_BY_ID = "UPDATE youlearn_tests SET question = $1, type = $2 WHERE id = $3";
+const UPDATE_TEST_QUESTION_BY_ID = "UPDATE youlearn_tests SET question = $1, type = $2, image gettest= $4 WHERE id = $3";
 const SELECT_ALL_TEST_ANSWERS_BY_TEST_ID = "SELECT * FROM youlearn_test_answers WHERE test_id = $1";
 const UPDATE_TEST_ANSWER_BY_ID = "UPDATE youlearn_test_answers SET text = $1, is_correct = $2 WHERE id = $3";
 const SELECT_TEST_BY_ID = "SELECT * FROM youlearn_tests WHERE id = $1";
@@ -413,8 +413,8 @@ app.post('/registration', cors(corsOptions), async (req, res) => {
 
 app.post("/updatetest", cors(corsOptions), async (req, res) => {
     console.log(req.body);
-    const {test_id, question, answer, type} = req.body;
-    await client.query(UPDATE_TEST_QUESTION_BY_ID, [question, type === "qubic" ? 0 : 1, test_id]);
+    const {test_id, question, answer, type, image} = req.body;
+    await client.query(UPDATE_TEST_QUESTION_BY_ID, [question, type === "qubic" ? 0 : 1, test_id, image]);
     //get all answers by test_id
     const answers_info = await client.query(SELECT_ALL_TEST_ANSWERS_BY_TEST_ID, [test_id]);
     const answers_from_db = answers_info.rows;

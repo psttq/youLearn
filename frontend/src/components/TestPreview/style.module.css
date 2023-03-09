@@ -4,6 +4,16 @@
     box-shadow: 3px 3px 5px rgba(99, 99, 99, 0.81);
     height: 90%;
 }
+
+.ImageContainer{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
 .QubicAnswers{
     margin-top: 30px;
     display: flex;

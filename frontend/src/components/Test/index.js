@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from "./style.module.css";
-import { Card, Typography} from "antd";
+import {Card, Image, Typography} from "antd";
 import AnswerButton from "../AnswerButton";
 
 const {Title, Text} = Typography;
@@ -24,12 +24,15 @@ function shuffle(array) {
 }
 
 
-const Test = ({type, question, answers, onClick}) => {
+const Test = ({type, question, answers, onClick, image}) => {
     shuffle(answers);
     console.log(type)
     return (
         <Card className={styles.TestCard} bodyStyle={{width: "100%", height: "100%"}} >
             <Title level={4}>{question}</Title>
+            <div className={styles.ImageContainer}>
+                {image && <Image src={image} width={400}/>}
+            </div>
             <div className={ type === 0 ? styles.QubicAnswers : styles.VerticalAnswers} >
                 {answers.map((answer, i) => <AnswerButton text={answer.text} id={answer.id} key={answer.id} onClick={(id)=>onClick(id)}/>)}
             </div>

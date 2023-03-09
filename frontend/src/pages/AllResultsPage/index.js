@@ -32,7 +32,17 @@ function AllResultsPage(props) {
 
     const navigate = useNavigate();
     const {id: card_id} = useParams();
+    const [card, setCard] = useState();
     const [results, setResults] = useState([]);
+
+    const getCardMutation = useMutation(() => {
+        return axios.post(`${API_URL}/card`, {
+            card_id
+        }).then(res => res.data).then(data => {
+            console.log(data);
+            setCard(data)
+        });
+    })
 
     const getResultsMutation = useMutation(() => {
         return axios.post(`${API_URL}/getresults`, {card_id}).then(res => res.data).then(data => {
@@ -49,13 +59,14 @@ function AllResultsPage(props) {
 
     useEffect(() => {
         getResultsMutation.mutate()
+        getCardMutation.mutate();
     }, []);
 
 
     return (
         <div className="App-main">
             <div className={styles.currentAttemptsContainer}>
-                <Title>Результаты:</Title>
+                {getCardMutation.isSuccess ? <Title>Результаты "{card.title}":</Title> : <></>}
                 <Table style={{width: "100%"}} columns={columns} dataSource={results} loading={getResultsMutation.isLoading}/>;
             </div>
         </div>
