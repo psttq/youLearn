@@ -35,7 +35,7 @@ const SELECT_TESTS_BY_CARD_ID = 'SELECT * FROM youlearn_tests WHERE card_id = $1
 const CREATE_TEST_QUERY = "INSERT INTO youlearn_tests(card_id, question) VALUES($1, 'Вопрос?')";
 const CREATE_TEST_ANSWER_QUERY = "INSERT INTO youlearn_test_answers(text, is_correct, test_id) VALUES('Ответ', $1, $2)";
 const SELECT_LAST_TEST_ID_BY_CARD_ID = "SELECT id FROM youlearn_tests WHERE card_id = $1 ORDER BY id DESC LIMIT 1";
-const UPDATE_TEST_QUESTION_BY_ID = "UPDATE youlearn_tests SET question = $1, type = $2, image gettest= $4 WHERE id = $3";
+const UPDATE_TEST_QUESTION_BY_ID = "UPDATE youlearn_tests SET question = $1, type = $2, image=$4 WHERE id = $3";
 const SELECT_ALL_TEST_ANSWERS_BY_TEST_ID = "SELECT * FROM youlearn_test_answers WHERE test_id = $1";
 const UPDATE_TEST_ANSWER_BY_ID = "UPDATE youlearn_test_answers SET text = $1, is_correct = $2 WHERE id = $3";
 const SELECT_TEST_BY_ID = "SELECT * FROM youlearn_tests WHERE id = $1";
@@ -70,10 +70,10 @@ app.use(cors(corsOptions));
 app.use(cookieParser())
 
 const client = new Pool({
-    user: 'student',
-    host: '195.19.32.74',
-    database: 'fn1132_2022',
-    password: 'bmstu',
+    user: 'postgres',
+    host: 'database',
+    database: 'postgres',
+    password: 'postgres',
     port: 5432,
     max: 20,
     idleTimeoutMillis: 30000,
